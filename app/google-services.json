@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "40738820089",
+    "project_id": "continuousauthentication-b1011",
+    "storage_bucket": "continuousauthentication-b1011.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:40738820089:android:e73ddb684490a8728f7728",
+        "android_client_info": {
+          "package_name": "dk.itu.continuousauthentication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "40738820089-s8poq9m04hjr19mt019ebfqo8lltsinl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDie8VQzUsvaTvc66TjfrDTcj-TpvNdYEs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "40738820089-s8poq9m04hjr19mt019ebfqo8lltsinl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

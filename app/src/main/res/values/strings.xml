@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">ContinuousAuthentication</string><string name="smile_name">What a beautiful smile!</string>
+    <string name="text_view">Look straight into the camera</string>
+    <string name="auth_msg">Provide your sequence of movements and end by clicking "Submit"</string>
+    <string name="app_msg">Congratulations, you have now successfully accessed your app! Click on the "Home" button below to return to the home screen or click on the "Decision" button below to simulate a decision-making process within this app.</string>
+    <string name="button_name">Enroll</string>
+    <string name="button_reset">Reset Movements</string>
+    <string name="button_save">Save</string>
+    <string name="button_next">Next</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="button_home">Home</string>
+    <string name="button_decision">Decision</string>
+    <string name="button_auth">Authenticate</string>
+    <string name="button_submit">Submit</string>
+    <string name="button_done">Done</string>
+    <string name="hint_name">Name</string>
+    <string name="msg_input_name">Please input a real name</string>
+    <string name="msg_reset">Your movements have correctly been reset</string>
+    <string name="msg_incorrect">Incorrect! Please try again.</string>
+</resources>
