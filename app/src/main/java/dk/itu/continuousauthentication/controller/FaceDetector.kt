@@ -3,29 +3,27 @@ package dk.itu.continuousauthentication.controller
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.RectF
-import android.os.Looper
 import android.util.Log
-import androidx.annotation.GuardedBy
-import com.google.android.gms.common.util.concurrent.HandlerExecutor
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
-import dk.itu.continuousauthentication.model.Person
-import java.util.concurrent.Executor
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import kotlin.math.abs
-
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import dk.itu.continuousauthentication.controller.FaceMovement.addMovement
 import dk.itu.continuousauthentication.controller.FaceMovement.setMode
+import dk.itu.continuousauthentication.model.Person
 import dk.itu.continuousauthentication.model.PersonsDB
 import dk.itu.continuousauthentication.utils.BitmapUtils
 import dk.itu.continuousauthentication.utils.Frame
 import java.nio.ByteBuffer
+import java.util.*
+import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import kotlin.collections.HashMap
+import kotlin.math.abs
 
 
-class FaceDetector private constructor() {
+class FaceDetector() : Observable() {
 
     private val mlkitFaceDetector = FaceDetection.getClient(
         FaceDetectorOptions.Builder()
@@ -50,10 +48,7 @@ class FaceDetector private constructor() {
     private val facesHashMap = HashMap<Int, String>()
     private var counter = 0
     private var movementTrigger = false
-    private var authenticationTrigger = false
     private var startAuthentication = false
-    private var stopAuthentication = false
-    private var authenticationStatus = false
     private var unknownFaceStatus = false
     private var finishedEnrollmentStatus = false
 
@@ -78,20 +73,14 @@ class FaceDetector private constructor() {
         movementTrigger = boolean
     }
 
-    fun setAuthenticationTrigger(boolean: Boolean) {
-        authenticationTrigger = boolean
-    }
-
     fun setStartAuthentication(boolean: Boolean) {
         startAuthentication = boolean
     }
 
-    fun setStopAuthentication(boolean: Boolean) {
-        stopAuthentication = boolean
-    }
-
-    fun getAuthenticationStatus(): Boolean {
-        return authenticationStatus
+    fun setUnknownFaceStatus(boolean: Boolean){
+        unknownFaceStatus = boolean
+        setChanged()
+        notifyObservers ()
     }
 
     fun getUnknownFaceStatus(): Boolean {
@@ -104,6 +93,10 @@ class FaceDetector private constructor() {
 
     fun getIdentifiedPerson(): Person {
         return identifiedPerson
+    }
+
+    fun close() {
+        mlkitFaceDetector.close()
     }
 
     /**
@@ -218,8 +211,7 @@ class FaceDetector private constructor() {
                                     if (identifiedPerson.name != "unknown") {
                                         facesHashMap[it.trackingId!!] = identifiedPerson.name
                                     } else {
-                                        unknownFaceStatus = true
-                                        isAuthenticating = false
+                                        setUnknownFaceStatus(true)
                                     }
                                 }
                                 if (identifiedPerson.name != "unknown") {
@@ -258,6 +250,9 @@ class FaceDetector private constructor() {
                             counter++
                             Log.i("FPS", "Counter at: $counter")
                             faces.forEach {
+                                if (it.trackingId != 0) {
+                                    setUnknownFaceStatus(true)
+                                }
                                 if (facesHashMap.containsKey(it.trackingId) && !facesHashMap[it.trackingId].equals(
                                         "unknown"
                                     ) && counter != 1
@@ -283,11 +278,14 @@ class FaceDetector private constructor() {
                                     Log.i("FaceRecognition", "Hashmap: $facesHashMap")
                                     if (identifiedPerson.name != "unknown") {
                                         facesHashMap[it.trackingId!!] = identifiedPerson.name
-                                    } else unknownFaceStatus = true
+                                    } else {
+                                        setUnknownFaceStatus(true)
+                                    }
                                 }
                             }
+                        } else {
+                            setUnknownFaceStatus(true)
                         }
-
                     }
 
                     .addOnFailureListener { exception ->
@@ -391,11 +389,5 @@ class FaceDetector private constructor() {
     companion object {
         private const val TAG = "FaceDetector"
         private const val MIN_FACE_SIZE = 0.15F
-
-        private lateinit var sFaceDetector: FaceDetector
-        operator fun get(context: Context): FaceDetector {
-            if (!::sFaceDetector.isInitialized) sFaceDetector = FaceDetector()
-            return sFaceDetector
-        }
     }
 }

@@ -15,8 +15,9 @@ import dk.itu.continuousauthentication.controller.FaceDetector
 import dk.itu.continuousauthentication.model.Person
 import dk.itu.continuousauthentication.utils.Frame
 import dk.itu.continuousauthentication.utils.LensFacing
+import java.util.*
 
-class AppEntryActivity: AppCompatActivity() {
+class AppEntryActivity: AppCompatActivity(), Observer {
     // GUI variables
     private lateinit var viewfinder: CameraView
     private lateinit var homeBtn: Button
@@ -32,7 +33,8 @@ class AppEntryActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_appentry)
         personsDB = PersonsDB[this]
-        faceDetector = FaceDetector[this]
+        faceDetector = FaceDetector()
+        faceDetector.addObserver(this)
 
         val lensFacing =
             savedInstanceState?.getSerializable(KEY_LENS_FACING) as Facing? ?: Facing.FRONT
@@ -71,6 +73,16 @@ class AppEntryActivity: AppCompatActivity() {
         viewfinder.destroy()
     }
 
+    override fun update(observable: Observable?, data: Any?) {
+        if (faceDetector.getUnknownFaceStatus()) {
+            faceDetector.setUnknownFaceStatus(false)
+            faceDetector.close()
+            viewfinder.destroy()
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
     private fun setupCamera(lensFacing: Facing) {
         viewfinder.facing = lensFacing
         viewfinder.addFrameProcessor {
@@ -83,6 +95,7 @@ class AppEntryActivity: AppCompatActivity() {
                     lensFacing = if (viewfinder.facing == Facing.BACK) LensFacing.BACK else LensFacing.FRONT
                 ), this, "unknown")
             if (faceDetector.getUnknownFaceStatus()) {
+                faceDetector.setUnknownFaceStatus(false)
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
             }
@@ -94,5 +107,5 @@ class AppEntryActivity: AppCompatActivity() {
     }
 
     // TODO: Don't allow user to leave screen
-    //TODO: Find a way to hide the camera view (maybe)
+    // TODO: Find a way to hide the camera view (maybe)
 }

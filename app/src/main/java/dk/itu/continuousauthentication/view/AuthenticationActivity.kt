@@ -9,19 +9,17 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import com.otaliastudios.cameraview.CameraView
 import com.otaliastudios.cameraview.Facing
-import dk.itu.continuousauthentication.model.PersonsDB
 import dk.itu.continuousauthentication.R
 import dk.itu.continuousauthentication.controller.FaceDetector
 import dk.itu.continuousauthentication.controller.MovementClassifier
-import dk.itu.continuousauthentication.model.Person
+import dk.itu.continuousauthentication.model.PersonsDB
 import dk.itu.continuousauthentication.utils.Frame
 import dk.itu.continuousauthentication.utils.LensFacing
+import java.util.*
 
-class AuthenticationActivity : AppCompatActivity() {
+class AuthenticationActivity : AppCompatActivity(), Observer {
     private val EXTRA_NAME =
         "dk.itu.continuousauthentication.view.name"
     private val EXTRA_LOCK =
@@ -36,7 +34,6 @@ class AuthenticationActivity : AppCompatActivity() {
 
     //Controller: Face Detector
     private lateinit var faceDetector: FaceDetector
-    private lateinit var movementClassifier: MovementClassifier
 
     private lateinit var name: String
     private var counter = 0
@@ -45,7 +42,8 @@ class AuthenticationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_authentication)
         personsDB = PersonsDB[this]
-        faceDetector = FaceDetector[this]
+        faceDetector = FaceDetector()
+        faceDetector.addObserver(this)
         if (intent.hasExtra(EXTRA_NAME)) name = intent.getStringExtra(EXTRA_NAME).toString()
         val lensFacing =
             savedInstanceState?.getSerializable(KEY_LENS_FACING) as Facing? ?: Facing.FRONT
@@ -98,6 +96,7 @@ class AuthenticationActivity : AppCompatActivity() {
                 } else {
                     faceDetector.setIsAuthenticating(false)
                     faceDetector.setStartAuthentication(false)
+                    faceDetector.setUnknownFaceStatus(false)
                     val toast = Toast.makeText(
                         this,
                         resources.getString(R.string.msg_timeout) + " Attempt $counter/3",
@@ -133,6 +132,19 @@ class AuthenticationActivity : AppCompatActivity() {
         viewfinder.destroy()
     }
 
+    override fun update(observable: Observable?, data: Any?) {
+        if (faceDetector.getUnknownFaceStatus()) {
+            faceDetector.setIsAuthenticating(false)
+            faceDetector.setStartAuthentication(false)
+            faceDetector.setUnknownFaceStatus(false)
+            faceDetector.close()
+            viewfinder.destroy()
+            val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra(EXTRA_LOCK, true)
+            startActivity(intent)
+        }
+    }
+
     private fun setupCamera(lensFacing: Facing) {
         viewfinder.facing = lensFacing
         viewfinder.addFrameProcessor {
@@ -145,11 +157,6 @@ class AuthenticationActivity : AppCompatActivity() {
                     lensFacing = if (viewfinder.facing == Facing.BACK) LensFacing.BACK else LensFacing.FRONT
                 ), this, "unknown"
             )
-            if (faceDetector.getUnknownFaceStatus()) {
-                val intent = Intent(this, MainActivity::class.java)
-                intent.putExtra(EXTRA_LOCK, true)
-                startActivity(intent)
-            }
         }
     }
 

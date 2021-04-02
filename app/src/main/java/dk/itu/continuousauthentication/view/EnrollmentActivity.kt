@@ -39,7 +39,7 @@ class EnrollmentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_enrollment)
         personsDB = PersonsDB[this]
-        faceDetector = FaceDetector[this]
+        faceDetector = FaceDetector()
         name = intent.getStringExtra(EXTRA_NAME).toString()
         val lensFacing =
             savedInstanceState?.getSerializable(KEY_LENS_FACING) as Facing? ?: Facing.FRONT

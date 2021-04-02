@@ -39,7 +39,7 @@ object FaceMovement {
     private var moreMode: Boolean = false
 
     fun addMovement(face: Face, context: Context, name: String, classifier: MovementClassifier) {
-        val faceDetector = FaceDetector[context]
+        val faceDetector = FaceDetector()
         val personsDB = PersonsDB[context]
 
         val rotX = face.headEulerAngleX // Head is facing upwards rotX degrees
