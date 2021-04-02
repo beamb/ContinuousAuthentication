@@ -102,6 +102,10 @@ class FaceDetector private constructor() {
         return finishedEnrollmentStatus
     }
 
+    fun getIdentifiedPerson(): Person {
+        return identifiedPerson
+    }
+
     /**
      * Kick-starts a face detection operation on a camera frame. If a previous face detection
      * operation is still ongoing, the frame is dropped until the face detector is no longer busy.
@@ -209,6 +213,20 @@ class FaceDetector private constructor() {
                                         identifiedPerson.name,
                                         classifier
                                     )
+                                    if (movementTrigger) {
+                                        faceBitmap = getFaceBitmap(
+                                            getScaledBoundingBox(it, this), Bitmap.createBitmap(
+                                                BitmapUtils.getBitmap(
+                                                    ByteBuffer.wrap(data),
+                                                    this
+                                                )!!
+                                            )
+                                        )
+                                        val embedding = faceClassifier.getEmbedding(faceBitmap)
+                                        val person = personsDB.getPerson(name)
+                                        person.addEmbeddings(embedding)
+                                        personsDB.add(person)
+                                    }
                                 } else if (::identifiedPerson.isInitialized) {
                                     classifier = MovementClassifier[identifiedPerson]
                                     setMode("auth")
@@ -218,6 +236,20 @@ class FaceDetector private constructor() {
                                         identifiedPerson.name,
                                         classifier
                                     )
+                                    if (movementTrigger) {
+                                        faceBitmap = getFaceBitmap(
+                                            getScaledBoundingBox(it, this), Bitmap.createBitmap(
+                                                BitmapUtils.getBitmap(
+                                                    ByteBuffer.wrap(data),
+                                                    this
+                                                )!!
+                                            )
+                                        )
+                                        val embedding = faceClassifier.getEmbedding(faceBitmap)
+                                        val person = personsDB.getPerson(name)
+                                        person.addEmbeddings(embedding)
+                                        personsDB.add(person)
+                                    }
                                 }
                             }
 

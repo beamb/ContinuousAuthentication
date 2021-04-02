@@ -37,10 +37,14 @@ class NameEnrollmentActivity : AppCompatActivity() {
                 if (!personsDB.contains(Person(name))) {
                     val person = Person(name)
                     personsDB.add(person)
+                    val intent = Intent(this, EnrollmentActivity::class.java)
+                    intent.putExtra(EXTRA_NAME, name)
+                    startActivity(intent)
+                } else {
+                    val intent = Intent(this, AuthenticationActivity::class.java)
+                    intent.putExtra(EXTRA_NAME, name)
+                    startActivity(intent)
                 }
-                val intent = Intent(this, EnrollmentActivity::class.java)
-                intent.putExtra(EXTRA_NAME, name)
-                startActivity(intent)
             } else {
                 val toast = Toast.makeText(
                     this,
@@ -52,5 +56,4 @@ class NameEnrollmentActivity : AppCompatActivity() {
             }
         })
     }
-    //TODO: Check name - if Person already exists, the movement is requested in order to enroll more images
 }

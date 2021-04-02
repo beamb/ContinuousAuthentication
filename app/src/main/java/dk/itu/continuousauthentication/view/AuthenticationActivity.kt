@@ -21,7 +21,10 @@ import dk.itu.continuousauthentication.model.Person
 import dk.itu.continuousauthentication.utils.Frame
 import dk.itu.continuousauthentication.utils.LensFacing
 
-class AuthenticationActivity: AppCompatActivity() {
+class AuthenticationActivity : AppCompatActivity() {
+    private val EXTRA_NAME =
+        "dk.itu.continuousauthentication.view.name"
+
     // GUI variables
     private lateinit var viewfinder: CameraView
     private lateinit var authBtn: Button
@@ -33,11 +36,14 @@ class AuthenticationActivity: AppCompatActivity() {
     private lateinit var faceDetector: FaceDetector
     private lateinit var movementClassifier: MovementClassifier
 
+    private lateinit var name: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_authentication)
         personsDB = PersonsDB[this]
         faceDetector = FaceDetector[this]
+        if (intent.hasExtra(EXTRA_NAME)) name = intent.getStringExtra(EXTRA_NAME).toString()
         val lensFacing =
             savedInstanceState?.getSerializable(KEY_LENS_FACING) as Facing? ?: Facing.FRONT
         viewfinder = findViewById(R.id.auth_camera_view)
@@ -54,8 +60,26 @@ class AuthenticationActivity: AppCompatActivity() {
             faceDetector.resetMovementClassifier()
             if (result) {
                 faceDetector.setIsAuthenticating(false)
-                val intent = Intent(this, AppEntryActivity::class.java)
-                startActivity(intent)
+                if (::name.isInitialized) {
+                    if (faceDetector.getIdentifiedPerson().name == name) {
+                        val intent = Intent(this, EnrollmentActivity::class.java)
+                        intent.putExtra(EXTRA_NAME, name)
+                        startActivity(intent)
+                    } else {
+                        val toast = Toast.makeText(
+                            this,
+                            "Sorry, you don't seem to be $name",
+                            Toast.LENGTH_SHORT
+                        )
+                        toast.setGravity(Gravity.CENTER, 0, 0)
+                        toast.show()
+                        val intent = Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                    }
+                } else {
+                    val intent = Intent(this, AppEntryActivity::class.java)
+                    startActivity(intent)
+                }
             } else {
                 val toast = Toast.makeText(
                     this,
