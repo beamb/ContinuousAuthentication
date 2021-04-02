@@ -17,4 +17,5 @@
     <string name="msg_input_name">Please input a real name</string>
     <string name="msg_reset">Your movements have correctly been reset</string>
     <string name="msg_incorrect">Incorrect! Please try again.</string>
+    <string name="msg_timeout">Incorrect! Wait 1 minute before trying again.</string>
 </resources>

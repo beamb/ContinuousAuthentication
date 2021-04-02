@@ -24,6 +24,8 @@ import dk.itu.continuousauthentication.utils.LensFacing
 class AuthenticationActivity : AppCompatActivity() {
     private val EXTRA_NAME =
         "dk.itu.continuousauthentication.view.name"
+    private val EXTRA_LOCK =
+        "dk.itu.continuousauthentication.view.lock"
 
     // GUI variables
     private lateinit var viewfinder: CameraView
@@ -37,6 +39,7 @@ class AuthenticationActivity : AppCompatActivity() {
     private lateinit var movementClassifier: MovementClassifier
 
     private lateinit var name: String
+    private var counter = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,15 +84,31 @@ class AuthenticationActivity : AppCompatActivity() {
                     startActivity(intent)
                 }
             } else {
-                val toast = Toast.makeText(
-                    this,
-                    resources.getString(R.string.msg_incorrect),
-                    Toast.LENGTH_SHORT
-                )
-                toast.setGravity(Gravity.CENTER, 0, 0)
-                toast.show()
-                faceDetector.setIsAuthenticating(true)
-                faceDetector.setStartAuthentication(true)
+                counter++
+                if (counter < 3) {
+                    val toast = Toast.makeText(
+                        this,
+                        resources.getString(R.string.msg_incorrect) + " Attempt $counter/3",
+                        Toast.LENGTH_SHORT
+                    )
+                    toast.setGravity(Gravity.CENTER, 0, 0)
+                    toast.show()
+                    faceDetector.setIsAuthenticating(true)
+                    faceDetector.setStartAuthentication(true)
+                } else {
+                    faceDetector.setIsAuthenticating(false)
+                    faceDetector.setStartAuthentication(false)
+                    val toast = Toast.makeText(
+                        this,
+                        resources.getString(R.string.msg_timeout) + " Attempt $counter/3",
+                        Toast.LENGTH_SHORT
+                    )
+                    toast.setGravity(Gravity.CENTER, 0, 0)
+                    toast.show()
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.putExtra(EXTRA_LOCK, true)
+                    startActivity(intent)
+                }
             }
         }
     }
@@ -128,6 +147,7 @@ class AuthenticationActivity : AppCompatActivity() {
             )
             if (faceDetector.getUnknownFaceStatus()) {
                 val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra(EXTRA_LOCK, true)
                 startActivity(intent)
             }
         }
@@ -137,7 +157,5 @@ class AuthenticationActivity : AppCompatActivity() {
         private const val KEY_LENS_FACING = "key-lens-facing"
     }
 
-    //TODO: Lock out user after too many failed attempts - Pass being locked out as an extra
-    //TODO: Block unknown user from authenticating
     //TODO: Find a way to hide the camera view (maybe)
 }

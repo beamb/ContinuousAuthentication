@@ -217,30 +217,34 @@ class FaceDetector private constructor() {
                                     Log.i("FaceRecognition", "Hashmap: $facesHashMap")
                                     if (identifiedPerson.name != "unknown") {
                                         facesHashMap[it.trackingId!!] = identifiedPerson.name
-                                    } else unknownFaceStatus = true
+                                    } else {
+                                        unknownFaceStatus = true
+                                        isAuthenticating = false
+                                    }
                                 }
-                                if (::identifiedPerson.isInitialized && ::classifier.isInitialized) {
-                                    if (classifier.person != identifiedPerson) classifier =
-                                        MovementClassifier[identifiedPerson]
-                                    setMode("auth")
-                                    addMovement(
-                                        it,
-                                        context,
-                                        identifiedPerson.name,
-                                        classifier
-                                    )
-                                } else if (::identifiedPerson.isInitialized) {
-                                    classifier = MovementClassifier[identifiedPerson]
-                                    setMode("auth")
-                                    addMovement(
-                                        it,
-                                        context,
-                                        identifiedPerson.name,
-                                        classifier
-                                    )
+                                if (identifiedPerson.name != "unknown") {
+                                    if (::identifiedPerson.isInitialized && ::classifier.isInitialized) {
+                                        if (classifier.person != identifiedPerson) classifier =
+                                            MovementClassifier[identifiedPerson]
+                                        setMode("auth")
+                                        addMovement(
+                                            it,
+                                            context,
+                                            identifiedPerson.name,
+                                            classifier
+                                        )
+                                    } else if (::identifiedPerson.isInitialized) {
+                                        classifier = MovementClassifier[identifiedPerson]
+                                        setMode("auth")
+                                        addMovement(
+                                            it,
+                                            context,
+                                            identifiedPerson.name,
+                                            classifier
+                                        )
+                                    }
                                 }
                             }
-
                         }
                     }
                     .addOnFailureListener { exception ->

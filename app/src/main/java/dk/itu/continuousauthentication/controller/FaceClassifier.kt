@@ -82,7 +82,7 @@ class FaceClassifier private constructor(context: Context) {
             val maxVal = Collections.max(similarities.keys)
             if (!this::globalPerson.isInitialized || globalPerson.name != similarities[maxVal]) {
                 Log.i("FaceRecognition", "MaxVal: $maxVal")
-                globalPerson = if (maxVal > 0.8) {
+                globalPerson = if (maxVal > 0.85) {
                     similarities[maxVal]?.let { personsDB.getPerson(it) }!!
                 } else Person("unknown")
             }
@@ -118,4 +118,6 @@ class FaceClassifier private constructor(context: Context) {
             return sFaceClassifier
         }
     }
+
+    // TODO: Figure out best cut-off point for maxVal authentication
 }
