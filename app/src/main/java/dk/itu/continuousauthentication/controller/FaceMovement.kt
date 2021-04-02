@@ -52,31 +52,30 @@ object FaceMovement {
 
         val person = personsDB.getPerson(name)
 
-        if (smile!! > 0.9) {
-            if (!isSmiling) {
-                isSmiling = true
-                val msg = "What a great smile ${person.name}!"
-                manageMovement(faceDetector, person, personsDB, classifier, msg, context, Smile)
-            }
-        } else {
-            isSmiling = false
-            faceDetector.setMovementTrigger(false)
-        }
         when {
+            smile!! > 0.9 -> {
+                if (!isSmiling) {
+                    isSmiling = true
+                    val msg = "What a great smile ${person.name}!"
+                    manageMovement(faceDetector, person, personsDB, classifier, msg, context, Smile)
+                }
+            }
             rightEye!! < 0.1 && leftEye!! < 0.1 -> {
                 bothEyesCounter++
                 rightEyeCounter = 0
                 leftEyeCounter = 0
                 if (bothEyesCounter == 6) {
                     val msg = "Your eyes are closed ${person.name}!"
-                    manageMovement(faceDetector, person, personsDB, classifier, msg, context, Closed)
+                    manageMovement(
+                        faceDetector,
+                        person,
+                        personsDB,
+                        classifier,
+                        msg,
+                        context,
+                        Closed
+                    )
                 }
-            }
-            rightEye > 0.1 && leftEye!! > 0.1 -> {
-                bothEyesCounter = 0
-                rightEyeCounter = 0
-                leftEyeCounter = 0
-                faceDetector.setMovementTrigger(false)
             }
             rightEye > 0.5 && leftEye!! < 0.1 -> {
                 rightEyeCounter++
@@ -84,7 +83,15 @@ object FaceMovement {
                 leftEyeCounter = 0
                 if (rightEyeCounter == 3) {
                     val msg = "Right Wink ${person.name}!"
-                    manageMovement(faceDetector, person, personsDB, classifier, msg, context, RightWink)
+                    manageMovement(
+                        faceDetector,
+                        person,
+                        personsDB,
+                        classifier,
+                        msg,
+                        context,
+                        RightWink
+                    )
                 }
             }
             rightEye < 0.1 && leftEye!! > 0.5 -> {
@@ -93,12 +100,17 @@ object FaceMovement {
                 rightEyeCounter = 0
                 if (leftEyeCounter == 3) {
                     val msg = "Left Wink ${person.name}!"
-                    manageMovement(faceDetector, person, personsDB, classifier, msg, context, LeftWink)
+                    manageMovement(
+                        faceDetector,
+                        person,
+                        personsDB,
+                        classifier,
+                        msg,
+                        context,
+                        LeftWink
+                    )
                 }
             }
-        }
-
-        when {
             rotY > 20.toFloat() -> {
                 if (!isFaceLeft) {
                     isFaceLeft = true
@@ -131,42 +143,70 @@ object FaceMovement {
                 if (!isTiltRight) {
                     isTiltRight = true
                     val msg = "Right Tilt ${person.name}!"
-                    manageMovement(faceDetector, person, personsDB, classifier, msg, context, RightTilt)
+                    manageMovement(
+                        faceDetector,
+                        person,
+                        personsDB,
+                        classifier,
+                        msg,
+                        context,
+                        RightTilt
+                    )
                 }
             }
             rotZ < (-15).toFloat() -> {
                 if (!isTiltLeft) {
                     isTiltLeft = true
                     val msg = "Left Tilt ${person.name}!"
-                    manageMovement(faceDetector, person, personsDB, classifier, msg, context, LeftTilt)
+                    manageMovement(
+                        faceDetector,
+                        person,
+                        personsDB,
+                        classifier,
+                        msg,
+                        context,
+                        LeftTilt
+                    )
                 }
             }
-            rotX < 20.toFloat() && rotX > (-5).toFloat() && rotY < 20.toFloat() && rotY > (-20).toFloat() && rotZ < 15.toFloat() && rotZ > (-15).toFloat() -> {
+            else -> {
                 isFaceDown = false
                 isFaceUp = false
                 isFaceLeft = false
                 isFaceRight = false
                 isTiltLeft = false
                 isTiltRight = false
+                isSmiling = false
+                bothEyesCounter = 0
+                rightEyeCounter = 0
+                leftEyeCounter = 0
                 faceDetector.setMovementTrigger(false)
             }
         }
     }
 
-    private fun manageMovement(faceDetector: FaceDetector, person: Person, personsDB: PersonsDB, classifier: MovementClassifier, msg: String, context: Context, movement: String){
-            if (addMode) {
-                faceDetector.setMovementTrigger(true)
-                person.addMovement(movement)
-                personsDB.add(person)
-                displayToast(context, msg)
-            } else if (authMode) {
-                classifier.addInput(movement)
-                displayToast(context, msg)
-            } else if (moreMode && person.movements.contains(movement)) {
-                faceDetector.setMovementTrigger(true)
-                displayToast(context, msg)
-            }
-            Log.i(TAG, msg)
+    private fun manageMovement(
+        faceDetector: FaceDetector,
+        person: Person,
+        personsDB: PersonsDB,
+        classifier: MovementClassifier,
+        msg: String,
+        context: Context,
+        movement: String
+    ) {
+        if (addMode) {
+            faceDetector.setMovementTrigger(true)
+            person.addMovement(movement)
+            personsDB.add(person)
+            displayToast(context, msg)
+        } else if (authMode) {
+            classifier.addInput(movement)
+            displayToast(context, msg)
+        } else if (moreMode && person.movements.contains(movement)) {
+            faceDetector.setMovementTrigger(true)
+            displayToast(context, msg)
+        }
+        Log.i(TAG, msg)
     }
 
     private fun displayToast(context: Context, msg: String) {
@@ -203,5 +243,4 @@ object FaceMovement {
             }
         }
     }
-    //TODO: Make all movements in same when so only one is possible at a time
 }
