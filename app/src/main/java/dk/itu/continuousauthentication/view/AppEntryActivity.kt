@@ -105,5 +105,4 @@ class AppEntryActivity: AppCompatActivity(), Observer {
     companion object {
         private const val KEY_LENS_FACING = "key-lens-facing"
     }
-    // TODO: Don't allow user to leave screen
 }

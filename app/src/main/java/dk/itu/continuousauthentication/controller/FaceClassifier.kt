@@ -82,7 +82,7 @@ class FaceClassifier(context: Context) {
             val maxVal = Collections.max(similarities.keys)
             if (!this::globalPerson.isInitialized || globalPerson.name != similarities[maxVal]) {
                 Log.i("FaceRecognition", "MaxVal: $maxVal")
-                globalPerson = if (maxVal > 0.85) {
+                globalPerson = if (maxVal > 0.8) {
                     similarities[maxVal]?.let { personsDB.getPerson(it) }!!
                 } else Person("unknown")
             }
