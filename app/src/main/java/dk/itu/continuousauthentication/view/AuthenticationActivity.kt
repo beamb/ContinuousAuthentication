@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.util.Size
 import android.view.Gravity
+import android.view.View.INVISIBLE
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -50,7 +51,6 @@ class AuthenticationActivity : AppCompatActivity(), Observer {
         viewfinder = findViewById(R.id.auth_camera_view)
         faceDetector.setIsAuthenticating(true)
         faceDetector.setStartAuthentication(true)
-        //viewfinder.isVisible = false
         setupCamera(lensFacing)
 
         authBtn = findViewById(R.id.btn_authenticate)
@@ -163,6 +163,4 @@ class AuthenticationActivity : AppCompatActivity(), Observer {
     companion object {
         private const val KEY_LENS_FACING = "key-lens-facing"
     }
-
-    //TODO: Find a way to hide the camera view (maybe)
 }
