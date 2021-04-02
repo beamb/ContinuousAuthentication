@@ -18,7 +18,7 @@ import kotlin.math.sqrt
 import org.tensorflow.lite.Interpreter
 
 
-class FaceClassifier private constructor(context: Context) {
+class FaceClassifier(context: Context) {
 
     private var interpreter: Interpreter? = null
 
@@ -109,14 +109,6 @@ class FaceClassifier private constructor(context: Context) {
 
     fun getGlobalPersonName(): Person {
         return if (this::globalPerson.isInitialized) globalPerson else Person("unknown")
-    }
-
-    companion object {
-        private lateinit var sFaceClassifier: FaceClassifier
-        operator fun get(context: Context): FaceClassifier {
-            if (!::sFaceClassifier.isInitialized) sFaceClassifier = FaceClassifier(context)
-            return sFaceClassifier
-        }
     }
 
     // TODO: Figure out best cut-off point for maxVal authentication

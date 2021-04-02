@@ -122,7 +122,7 @@ class FaceDetector() : Observable() {
         context: Context, name: String) {
         val data = data ?: return
         val inputImage = InputImage.fromByteArray(data, size.width, size.height, rotation, format)
-        val faceClassifier = FaceClassifier[context]
+        val faceClassifier = FaceClassifier(context)
         when {
             isEnrolling -> {
                 mlkitFaceDetector.process(inputImage)
@@ -182,17 +182,15 @@ class FaceDetector() : Observable() {
                     .addOnSuccessListener { faces ->
                         if (faces.size > 0) {
                             counter++
-                            Log.i("FPS", "Counter at: $counter")
                             faces.forEach {
+                                if (it.trackingId != 0) {
+                                    setUnknownFaceStatus(true)
+                                }
                                 if (facesHashMap.containsKey(it.trackingId) && !facesHashMap[it.trackingId].equals(
                                         "unknown"
                                     ) && counter != 1
                                 ) {
-                                    Log.i("FaceRecognition", "Hashmap: $facesHashMap")
-                                    Log.i(
-                                        "FaceRecognition",
-                                        "Recognition: ${it.trackingId} --> ${facesHashMap[it.trackingId]}"
-                                    )
+                                    Log.i("FaceRecognition", "Counter: $counter")
                                     if (counter > 10) {
                                         counter = 0
                                     }
@@ -207,10 +205,12 @@ class FaceDetector() : Observable() {
                                     )
                                     faceClassifier.classify(faceBitmap)
                                     identifiedPerson = faceClassifier.getGlobalPersonName()
-                                    Log.i("FaceRecognition", "Hashmap: $facesHashMap")
+                                    Log.i("FaceRecognition", "Hashmap before: $facesHashMap")
                                     if (identifiedPerson.name != "unknown") {
                                         facesHashMap[it.trackingId!!] = identifiedPerson.name
+                                        Log.i("FaceRecognition", "Hashmap after adding: $facesHashMap")
                                     } else {
+                                        Log.i("FaceRecognition", "Hashmap after unknown: $facesHashMap")
                                         setUnknownFaceStatus(true)
                                     }
                                 }
