@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import android.util.Log
 import com.google.gson.Gson
 import dk.itu.continuousauthentication.database.PersonBaseHelper
 import dk.itu.continuousauthentication.database.PersonCursorWrapper
@@ -38,8 +39,10 @@ class PersonsDB private constructor(context: Context) {
         val values = getContentValues(person)
         if (!getPersonsDB().contains(person)) {
             mDatabase.insert(PersonsDBSchema.PersonTable.NAME, null, values)
+            Log.i("PersonsDB", "Adding ${person.name} with embeddings of size ${person.embeddings.size} and the movements ${person.movements.toString()}")
         } else {
             mDatabase.update(PersonsDBSchema.PersonTable.NAME, values, null, null)
+            Log.i("PersonsDB", "Updating ${person.name} with embeddings of size ${person.embeddings.size} and the movements ${person.movements.toString()}")
         }
     }
 

@@ -108,7 +108,4 @@ class EnrollmentActivity : AppCompatActivity() {
     companion object {
         private const val KEY_LENS_FACING = "key-lens-facing"
     }
-
-    //TODO: If Person already exists, and they have movements - Bitmaps should only be triggered by the stored movements and not any movement
-    //TODO: Can only re-enroll if similar enough to previously enrolled images
 }

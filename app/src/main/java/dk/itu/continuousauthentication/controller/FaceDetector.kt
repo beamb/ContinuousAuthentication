@@ -158,7 +158,22 @@ class FaceDetector private constructor() {
                                         personsDB.add(person)
                                     }
                                 } else {
-                                    setMode("stop")
+                                    setMode("more")
+                                    addMovement(it, context, name, classifier)
+                                    if (movementTrigger) {
+                                        faceBitmap = getFaceBitmap(
+                                            getScaledBoundingBox(it, this), Bitmap.createBitmap(
+                                                BitmapUtils.getBitmap(
+                                                    ByteBuffer.wrap(data),
+                                                    this
+                                                )!!
+                                            )
+                                        )
+                                        val embedding = faceClassifier.getEmbedding(faceBitmap)
+                                        val person = personsDB.getPerson(name)
+                                        person.addEmbeddings(embedding)
+                                        personsDB.add(person)
+                                    }
                                     finishedEnrollmentStatus = true
                                     counter = 0
                                 }
@@ -180,6 +195,7 @@ class FaceDetector private constructor() {
                                         "unknown"
                                     ) && counter != 1
                                 ) {
+                                    Log.i("FaceRecognition", "Hashmap: $facesHashMap")
                                     Log.i(
                                         "FaceRecognition",
                                         "Recognition: ${it.trackingId} --> ${facesHashMap[it.trackingId]}"
@@ -213,20 +229,6 @@ class FaceDetector private constructor() {
                                         identifiedPerson.name,
                                         classifier
                                     )
-                                    if (movementTrigger) {
-                                        faceBitmap = getFaceBitmap(
-                                            getScaledBoundingBox(it, this), Bitmap.createBitmap(
-                                                BitmapUtils.getBitmap(
-                                                    ByteBuffer.wrap(data),
-                                                    this
-                                                )!!
-                                            )
-                                        )
-                                        val embedding = faceClassifier.getEmbedding(faceBitmap)
-                                        val person = personsDB.getPerson(name)
-                                        person.addEmbeddings(embedding)
-                                        personsDB.add(person)
-                                    }
                                 } else if (::identifiedPerson.isInitialized) {
                                     classifier = MovementClassifier[identifiedPerson]
                                     setMode("auth")
@@ -236,20 +238,6 @@ class FaceDetector private constructor() {
                                         identifiedPerson.name,
                                         classifier
                                     )
-                                    if (movementTrigger) {
-                                        faceBitmap = getFaceBitmap(
-                                            getScaledBoundingBox(it, this), Bitmap.createBitmap(
-                                                BitmapUtils.getBitmap(
-                                                    ByteBuffer.wrap(data),
-                                                    this
-                                                )!!
-                                            )
-                                        )
-                                        val embedding = faceClassifier.getEmbedding(faceBitmap)
-                                        val person = personsDB.getPerson(name)
-                                        person.addEmbeddings(embedding)
-                                        personsDB.add(person)
-                                    }
                                 }
                             }
 
