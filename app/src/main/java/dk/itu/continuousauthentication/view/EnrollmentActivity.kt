@@ -2,13 +2,11 @@ package dk.itu.continuousauthentication.view
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.util.Size
 import android.view.Gravity
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import com.otaliastudios.cameraview.CameraView
 import com.otaliastudios.cameraview.Facing
 import dk.itu.continuousauthentication.R
@@ -49,7 +47,6 @@ class EnrollmentActivity : AppCompatActivity() {
 
         doneBtn = findViewById(R.id.btn_done)
         doneBtn.setOnClickListener {
-            Log.i("Roman", "Person: ${personsDB.getPerson(name)} and ArrayList of FloatArray: ${personsDB.getPerson(name).embeddings.toString()}")
             if (faceDetector.getFinishedEnrollmentStatus()) {
                 faceDetector.setIsEnrolling(false)
                 val intent = Intent(this, MainActivity::class.java)

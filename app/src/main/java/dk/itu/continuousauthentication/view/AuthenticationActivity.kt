@@ -5,16 +5,13 @@ import android.os.Bundle
 import android.util.Log
 import android.util.Size
 import android.view.Gravity
-import android.view.View.INVISIBLE
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import com.otaliastudios.cameraview.CameraView
 import com.otaliastudios.cameraview.Facing
 import dk.itu.continuousauthentication.R
 import dk.itu.continuousauthentication.controller.FaceDetector
-import dk.itu.continuousauthentication.controller.MovementClassifier
 import dk.itu.continuousauthentication.model.PersonsDB
 import dk.itu.continuousauthentication.utils.Frame
 import dk.itu.continuousauthentication.utils.LensFacing
@@ -57,7 +54,7 @@ class AuthenticationActivity : AppCompatActivity(), Observer {
         authBtn.setOnClickListener {
             Log.i("FaceRecognition", "Input: ${faceDetector.displayInput()}")
             faceDetector.setStartAuthentication(false)
-            var result = faceDetector.checkInput()
+            val result = faceDetector.checkInput()
             faceDetector.resetMovementClassifier()
             if (result) {
                 faceDetector.setIsAuthenticating(false)

@@ -22,7 +22,7 @@ class FaceClassifier private constructor(context: Context) {
     private var interpreter: Interpreter? = null
 
     // Model: Database of persons
-    private lateinit var personsDB: PersonsDB
+    private var personsDB: PersonsDB
 
     init {
         val inputStream: InputStream = context.assets.open("MobileFaceNet.tflite")

@@ -13,8 +13,8 @@ class PersonBaseHelper(context: Context?) :
     ) {
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
-            "create table " + PersonsDBSchema.PersonTable.NAME.toString() + "(" +
-                    PersonsDBSchema.PersonTable.Cols.NAME.toString() + ", " + PersonsDBSchema.PersonTable.Cols.EMBEDDINGS.toString() + ", " + PersonsDBSchema.PersonTable.Cols.MOVEMENTS.toString() + ")"
+            "create table " + PersonsDBSchema.PersonTable.NAME + "(" +
+                    PersonsDBSchema.PersonTable.Cols.NAME + ", " + PersonsDBSchema.PersonTable.Cols.EMBEDDINGS + ", " + PersonsDBSchema.PersonTable.Cols.MOVEMENTS + ")"
         )
     }
 

@@ -23,7 +23,7 @@ import kotlin.collections.HashMap
 import kotlin.math.abs
 
 
-class FaceDetector() : Observable() {
+class FaceDetector : Observable() {
 
     private val mlkitFaceDetector = FaceDetection.getClient(
         FaceDetectorOptions.Builder()
@@ -186,7 +186,7 @@ class FaceDetector() : Observable() {
                                 if (it.trackingId != 0) {
                                     setUnknownFaceStatus(true)
                                 }
-                                if (facesHashMap.containsKey(it.trackingId) && !facesHashMap[it.trackingId].equals(
+                                if (facesHashMap.containsKey(it.trackingId!!) && !facesHashMap[it.trackingId!!].equals(
                                         "unknown"
                                     ) && counter != 1
                                 ) {
@@ -204,12 +204,12 @@ class FaceDetector() : Observable() {
                                         )
                                     )
                                     identifiedPerson = faceClassifier.classify(faceBitmap)
-                                    Log.i("FaceRecognition", "Hashmap before: $facesHashMap")
+                                    Log.i("FaceRecognition", "HashMap before: $facesHashMap")
                                     if (identifiedPerson.name != "unknown") {
                                         facesHashMap[it.trackingId!!] = identifiedPerson.name
-                                        Log.i("FaceRecognition", "Hashmap after adding: $facesHashMap")
+                                        Log.i("FaceRecognition", "HashMap after adding: $facesHashMap")
                                     } else {
-                                        Log.i("FaceRecognition", "Hashmap after unknown: $facesHashMap")
+                                        Log.i("FaceRecognition", "HashMap after unknown: $facesHashMap")
                                         setUnknownFaceStatus(true)
                                     }
                                 }
@@ -252,13 +252,13 @@ class FaceDetector() : Observable() {
                                 if (it.trackingId != 0) {
                                     setUnknownFaceStatus(true)
                                 }
-                                if (facesHashMap.containsKey(it.trackingId) && !facesHashMap[it.trackingId].equals(
+                                if (facesHashMap.containsKey(it.trackingId!!) && !facesHashMap[it.trackingId!!].equals(
                                         "unknown"
                                     ) && counter != 1
                                 ) {
                                     Log.i(
                                         "FaceRecognition",
-                                        "Recognition: ${it.trackingId} --> ${facesHashMap[it.trackingId]}"
+                                        "Recognition: ${it.trackingId} --> ${facesHashMap[it.trackingId!!]}"
                                     )
                                     if (counter > 10) {
                                         counter = 0
@@ -273,7 +273,7 @@ class FaceDetector() : Observable() {
                                         )
                                     )
                                     identifiedPerson = faceClassifier.classify(faceBitmap)
-                                    Log.i("FaceRecognition", "Hashmap: $facesHashMap")
+                                    Log.i("FaceRecognition", "HashMap: $facesHashMap")
                                     if (identifiedPerson.name != "unknown") {
                                         facesHashMap[it.trackingId!!] = identifiedPerson.name
                                     } else {
@@ -315,8 +315,8 @@ class FaceDetector() : Observable() {
         val offsetX = abs((frame.width - screenWidth) / 2)
         val offsetY = abs((frame.height - screenHeight) * 2)
         Log.i("crop", "offsetX, offsetY: $offsetX, $offsetY")
-        var boxCenterX: Float
-        var boxCenterY: Float
+        val boxCenterX: Float
+        val boxCenterY: Float
         if (offsetX != 0 && offsetY != 0) {
             val centerX = (boundingBox.left + (boundingBox.right - boundingBox.left) / 2) + offsetX
             val centerY = (boundingBox.top + (boundingBox.bottom - boundingBox.top) / 2) + offsetY
@@ -333,7 +333,7 @@ class FaceDetector() : Observable() {
             Log.i("crop", "boxCenterX, boxCenterY: $boxCenterX, $boxCenterY")
         }
 
-        var bbHeight = boundingBox.height()
+        val bbHeight = boundingBox.height()
         Log.i("crop", "$bbHeight")
         val faceX: Int =
             if ((boxCenterX + boundingBox.width()) > frame.width || ((boxCenterX + boundingBox.width()) + (boxCenterX - boundingBox.width()) < 0)) 0 else boxCenterX.toInt()

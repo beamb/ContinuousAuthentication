@@ -5,14 +5,11 @@ import android.os.Bundle
 import android.util.Size
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import com.otaliastudios.cameraview.CameraView
 import com.otaliastudios.cameraview.Facing
-import dk.itu.continuousauthentication.model.PersonsDB
 import dk.itu.continuousauthentication.R
 import dk.itu.continuousauthentication.controller.FaceDetector
-import dk.itu.continuousauthentication.model.Person
+import dk.itu.continuousauthentication.model.PersonsDB
 import dk.itu.continuousauthentication.utils.Frame
 import dk.itu.continuousauthentication.utils.LensFacing
 import java.util.*

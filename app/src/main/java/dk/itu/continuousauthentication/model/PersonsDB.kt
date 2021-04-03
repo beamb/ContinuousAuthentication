@@ -39,10 +39,10 @@ class PersonsDB private constructor(context: Context) {
         val values = getContentValues(person)
         if (!getPersonsDB().contains(person)) {
             mDatabase.insert(PersonsDBSchema.PersonTable.NAME, null, values)
-            Log.i("PersonsDB", "Adding ${person.name} with embeddings of size ${person.embeddings.size} and the movements ${person.movements.toString()}")
+            Log.i("PersonsDB", "Adding ${person.name} with embeddings of size ${person.embeddings.size} and the movements ${person.movements}")
         } else {
             mDatabase.update(PersonsDBSchema.PersonTable.NAME, values, null, null)
-            Log.i("PersonsDB", "Updating ${person.name} with embeddings of size ${person.embeddings.size} and the movements ${person.movements.toString()}")
+            Log.i("PersonsDB", "Updating ${person.name} with embeddings of size ${person.embeddings.size} and the movements ${person.movements}")
         }
     }
 

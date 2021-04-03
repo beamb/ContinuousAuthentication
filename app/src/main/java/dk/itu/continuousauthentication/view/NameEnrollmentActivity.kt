@@ -3,13 +3,10 @@ package dk.itu.continuousauthentication.view
 import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import dk.itu.continuousauthentication.R
 import dk.itu.continuousauthentication.model.Person
 import dk.itu.continuousauthentication.model.PersonsDB
@@ -31,7 +28,7 @@ class NameEnrollmentActivity : AppCompatActivity() {
         personsDB = PersonsDB[this]
         etName = findViewById(R.id.et_name)
         registerBtn = findViewById(R.id.btn_register)
-        registerBtn.setOnClickListener(View.OnClickListener {
+        registerBtn.setOnClickListener {
             val name = etName.text.toString().trim()
             if (name != "unknown" && name != "") {
                 if (!personsDB.contains(Person(name))) {
@@ -54,6 +51,6 @@ class NameEnrollmentActivity : AppCompatActivity() {
                 toast.setGravity(Gravity.CENTER, 0, 0)
                 toast.show()
             }
-        })
+        }
     }
 }

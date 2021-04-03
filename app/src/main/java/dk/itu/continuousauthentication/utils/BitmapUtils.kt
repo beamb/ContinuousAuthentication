@@ -7,7 +7,6 @@ import java.nio.ByteBuffer
 
 /** Utils functions for bitmap conversions.  */
 object BitmapUtils {
-    private const val TAG = "ByteBufferUtils"
 
     /** Converts NV21 format byte buffer to bitmap.  */
     fun getBitmap(data: ByteBuffer, metadata: Frame): Bitmap? {
@@ -36,8 +35,8 @@ object BitmapUtils {
             return rotateBitmap(
                 bmp,
                 metadata.rotation,
-                true,
-                false
+                flipX = true,
+                flipY = false
             )
         } catch (e: Exception) {
             Log.e("VisionProcessorBase", "Error: " + e.message)

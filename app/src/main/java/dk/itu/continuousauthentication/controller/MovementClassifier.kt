@@ -12,7 +12,7 @@ class MovementClassifier private constructor(val person: Person) {
         inputs.append(movement)
         Log.i("MovementClassifier", "Input size: ${inputs.length} and person: ${person.name}")
         Log.i("MovementClassifier", "Input: $inputs and person movements length: ${person.movements.length}")
-        Log.i("MovementClassifier", "Input: $inputs and person movements: ${person.movements.toString()}")
+        Log.i("MovementClassifier", "Input: $inputs and person movements: ${person.movements}")
     }
 
     fun checkInput(): Boolean {

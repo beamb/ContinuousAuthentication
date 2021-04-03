@@ -2,7 +2,6 @@ package dk.itu.continuousauthentication.database
 
 import android.database.Cursor
 import android.database.CursorWrapper
-import android.provider.MediaStore.Video
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dk.itu.continuousauthentication.model.Person
