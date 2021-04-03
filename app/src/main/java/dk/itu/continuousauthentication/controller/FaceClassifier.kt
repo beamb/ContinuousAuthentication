@@ -11,21 +11,18 @@ import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
 import kotlin.math.sqrt
 
 import org.tensorflow.lite.Interpreter
 
 
-class FaceClassifier(context: Context) {
+class FaceClassifier private constructor(context: Context) {
 
     private var interpreter: Interpreter? = null
 
     // Model: Database of persons
     private lateinit var personsDB: PersonsDB
-
-    private lateinit var globalPerson: Person
 
     init {
         val inputStream: InputStream = context.assets.open("MobileFaceNet.tflite")
@@ -56,10 +53,10 @@ class FaceClassifier(context: Context) {
         return result
     }
 
-    fun classify(face: Bitmap) {
+    fun classify(face: Bitmap): Person {
         val embeddings = getEmbedding(face)
         Log.i("Enrollment", "persons in FaceClassifier: ${personsDB.getPersonsDB()}")
-        try {
+        return try {
             recognize(embeddings)
 
         } catch (e: IOException) {
@@ -67,11 +64,11 @@ class FaceClassifier(context: Context) {
                 "FaceClassifier",
                 "Classification IOException : $e"
             )
-            "error"
+            Person("error")
         }
     }
 
-    private fun recognize(embedding: FloatArray) {
+    private fun recognize(embedding: FloatArray): Person {
         if (personsDB.isNotEmpty()) {
             val similarities = LinkedHashMap<Float, String>()
             for (person in personsDB.getPersonsDB()) {
@@ -80,13 +77,12 @@ class FaceClassifier(context: Context) {
                 }
             }
             val maxVal = Collections.max(similarities.keys)
-            if (!this::globalPerson.isInitialized || globalPerson.name != similarities[maxVal]) {
-                Log.i("FaceRecognition", "MaxVal: $maxVal")
-                globalPerson = if (maxVal > 0.8) {
-                    similarities[maxVal]?.let { personsDB.getPerson(it) }!!
-                } else Person("unknown")
-            }
+            Log.i("FaceRecognition", "MaxVal: $maxVal")
+            return if (maxVal > 0.8) {
+                similarities[maxVal]?.let { personsDB.getPerson(it) }!!
+            } else Person("unknown")
         }
+        return Person("unknown")
     }
 
     private fun cosineSimilarity(A: FloatArray?, B: FloatArray?): Float {
@@ -107,8 +103,12 @@ class FaceClassifier(context: Context) {
         } else (sumProduct / (sqrt(sumASq) * sqrt(sumBSq))).toFloat()
     }
 
-    fun getGlobalPersonName(): Person {
-        return if (this::globalPerson.isInitialized) globalPerson else Person("unknown")
+    companion object {
+        private lateinit var sFaceClassifier: FaceClassifier
+        operator fun get(context: Context): FaceClassifier {
+            if (!::sFaceClassifier.isInitialized) sFaceClassifier = FaceClassifier(context)
+            return sFaceClassifier
+        }
     }
 
     // TODO: Figure out best cut-off point for maxVal authentication

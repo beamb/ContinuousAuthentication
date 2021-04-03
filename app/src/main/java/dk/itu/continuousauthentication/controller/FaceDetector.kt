@@ -122,7 +122,7 @@ class FaceDetector() : Observable() {
         context: Context, name: String) {
         val data = data ?: return
         val inputImage = InputImage.fromByteArray(data, size.width, size.height, rotation, format)
-        val faceClassifier = FaceClassifier(context)
+        val faceClassifier = FaceClassifier[context]
         when {
             isEnrolling -> {
                 mlkitFaceDetector.process(inputImage)
@@ -203,8 +203,7 @@ class FaceDetector() : Observable() {
                                             )!!
                                         )
                                     )
-                                    faceClassifier.classify(faceBitmap)
-                                    identifiedPerson = faceClassifier.getGlobalPersonName()
+                                    identifiedPerson = faceClassifier.classify(faceBitmap)
                                     Log.i("FaceRecognition", "Hashmap before: $facesHashMap")
                                     if (identifiedPerson.name != "unknown") {
                                         facesHashMap[it.trackingId!!] = identifiedPerson.name
@@ -273,8 +272,7 @@ class FaceDetector() : Observable() {
                                             )!!
                                         )
                                     )
-                                    faceClassifier.classify(faceBitmap)
-                                    identifiedPerson = faceClassifier.getGlobalPersonName()
+                                    identifiedPerson = faceClassifier.classify(faceBitmap)
                                     Log.i("FaceRecognition", "Hashmap: $facesHashMap")
                                     if (identifiedPerson.name != "unknown") {
                                         facesHashMap[it.trackingId!!] = identifiedPerson.name
