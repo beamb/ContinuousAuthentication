@@ -47,7 +47,6 @@ class FaceDetector : Observable() {
 
     private val facesHashMap = HashMap<Int, String>()
     private var counter = 0
-    private var movementTrigger = false
     private var startAuthentication = false
     private var unknownFaceStatus = false
     private var finishedEnrollmentStatus = false
@@ -69,18 +68,14 @@ class FaceDetector : Observable() {
         isAuthenticating = boolean
     }
 
-    fun setMovementTrigger(boolean: Boolean) {
-        movementTrigger = boolean
-    }
-
     fun setStartAuthentication(boolean: Boolean) {
         startAuthentication = boolean
     }
 
-    fun setUnknownFaceStatus(boolean: Boolean){
+    fun setUnknownFaceStatus(boolean: Boolean) {
         unknownFaceStatus = boolean
         setChanged()
-        notifyObservers ()
+        notifyObservers()
     }
 
     fun getUnknownFaceStatus(): Boolean {
@@ -105,7 +100,8 @@ class FaceDetector : Observable() {
      */
     fun process(
         frame: Frame,
-        context: Context, name: String) {
+        context: Context, name: String
+    ) {
 
         screenWidth = context.resources.displayMetrics.widthPixels
         screenHeight = context.resources.displayMetrics.heightPixels
@@ -119,7 +115,8 @@ class FaceDetector : Observable() {
 
 
     private fun Frame.detectFaces(
-        context: Context, name: String) {
+        context: Context, name: String
+    ) {
         val data = data ?: return
         val inputImage = InputImage.fromByteArray(data, size.width, size.height, rotation, format)
         val faceClassifier = FaceClassifier[context]
@@ -127,50 +124,42 @@ class FaceDetector : Observable() {
             isEnrolling -> {
                 mlkitFaceDetector.process(inputImage)
                     .addOnSuccessListener { faces ->
-                        if (faces.size > 0) {
+                        if (faces.size == 1) {
                             counter++
                             faces.forEach {
                                 if (!::classifier.isInitialized) classifier =
-                                    MovementClassifier[personsDB.getPerson(name)]
+                                    MovementClassifier[context, personsDB.getPerson(name)]
                                 if (personsDB.getPerson(name).movements.length <= 4) {
                                     finishedEnrollmentStatus = false
                                     setMode("add")
-                                    addMovement(it, context, name, classifier)
-                                    if (counter == 1 || movementTrigger) {
-                                        faceBitmap = getFaceBitmap(
-                                            getScaledBoundingBox(it, this), Bitmap.createBitmap(
-                                                BitmapUtils.getBitmap(
-                                                    ByteBuffer.wrap(data),
-                                                    this
-                                                )!!
-                                            )
+                                    if (counter == 1 || addMovement(
+                                            it,
+                                            context,
+                                            name,
+                                            classifier
                                         )
-                                        val embedding = faceClassifier.getEmbedding(faceBitmap)
-                                        val person = personsDB.getPerson(name)
-                                        person.addEmbeddings(embedding)
-                                        personsDB.add(person)
+                                    ) {
+                                        Log.i(
+                                            "Recognize",
+                                            "Capturing you, $name when counter is at $counter and you have ${personsDB.getPerson(
+                                                name
+                                            ).movements.length} movements!"
+                                        )
+                                        makePersonFromBitmap(it, this, data, faceClassifier, name)
                                     }
                                 } else {
                                     setMode("more")
-                                    addMovement(it, context, name, classifier)
-                                    if (movementTrigger) {
-                                        faceBitmap = getFaceBitmap(
-                                            getScaledBoundingBox(it, this), Bitmap.createBitmap(
-                                                BitmapUtils.getBitmap(
-                                                    ByteBuffer.wrap(data),
-                                                    this
-                                                )!!
-                                            )
-                                        )
-                                        val embedding = faceClassifier.getEmbedding(faceBitmap)
-                                        val person = personsDB.getPerson(name)
-                                        person.addEmbeddings(embedding)
-                                        personsDB.add(person)
+                                    if (addMovement(it, context, name, classifier)) {
+                                        Log.i("Recognize", "Capturing you, $name!")
+                                        makePersonFromBitmap(it, this, data, faceClassifier, name)
                                     }
                                     finishedEnrollmentStatus = true
                                     counter = 0
                                 }
                             }
+                        } else {
+                            Log.i("Recognize", "Faces size = ${faces.size}")
+                            setUnknownFaceStatus(true)
                         }
                     }
                     .addOnFailureListener { exception ->
@@ -180,43 +169,22 @@ class FaceDetector : Observable() {
             isAuthenticating -> {
                 mlkitFaceDetector.process(inputImage)
                     .addOnSuccessListener { faces ->
-                        if (faces.size > 0) {
+                        if (faces.size == 1) {
                             counter++
                             faces.forEach {
-                                if (it.trackingId != 0) {
-                                    setUnknownFaceStatus(true)
-                                }
                                 if (facesHashMap.containsKey(it.trackingId!!) && !facesHashMap[it.trackingId!!].equals(
                                         "unknown"
                                     ) && counter != 1
                                 ) {
                                     Log.i("FaceRecognition", "Counter: $counter")
-                                    if (counter > 10) {
+                                    if (counter > 20) {
                                         counter = 0
                                     }
-                                } else {
-                                    faceBitmap = getFaceBitmap(
-                                        getScaledBoundingBox(it, this), Bitmap.createBitmap(
-                                            BitmapUtils.getBitmap(
-                                                ByteBuffer.wrap(data),
-                                                this
-                                            )!!
-                                        )
-                                    )
-                                    identifiedPerson = faceClassifier.classify(faceBitmap)
-                                    Log.i("FaceRecognition", "HashMap before: $facesHashMap")
-                                    if (identifiedPerson.name != "unknown") {
-                                        facesHashMap[it.trackingId!!] = identifiedPerson.name
-                                        Log.i("FaceRecognition", "HashMap after adding: $facesHashMap")
-                                    } else {
-                                        Log.i("FaceRecognition", "HashMap after unknown: $facesHashMap")
-                                        setUnknownFaceStatus(true)
-                                    }
-                                }
-                                if (identifiedPerson.name != "unknown") {
-                                    if (::identifiedPerson.isInitialized && ::classifier.isInitialized) {
-                                        if (classifier.person != identifiedPerson) classifier =
-                                            MovementClassifier[identifiedPerson]
+                                    if (::classifier.isInitialized) {
+                                        if (classifier.person.name != identifiedPerson.name) classifier =
+                                            MovementClassifier[context, personsDB.getPerson(
+                                                identifiedPerson.name
+                                            )]
                                         setMode("auth")
                                         addMovement(
                                             it,
@@ -224,8 +192,38 @@ class FaceDetector : Observable() {
                                             identifiedPerson.name,
                                             classifier
                                         )
-                                    } else if (::identifiedPerson.isInitialized) {
-                                        classifier = MovementClassifier[identifiedPerson]
+                                    } else {
+                                        classifier =
+                                            MovementClassifier[context, personsDB.getPerson(
+                                                identifiedPerson.name
+                                            )]
+                                        setMode("auth")
+                                        addMovement(
+                                            it,
+                                            context,
+                                            identifiedPerson.name,
+                                            classifier
+                                        )
+                                    }
+                                } else {
+                                    identifyFromBitmap(it, this, data, faceClassifier)
+                                    if (::classifier.isInitialized) {
+                                        if (classifier.person.name != identifiedPerson.name) classifier =
+                                            MovementClassifier[context, personsDB.getPerson(
+                                                identifiedPerson.name
+                                            )]
+                                        setMode("auth")
+                                        addMovement(
+                                            it,
+                                            context,
+                                            identifiedPerson.name,
+                                            classifier
+                                        )
+                                    } else {
+                                        classifier =
+                                            MovementClassifier[context, personsDB.getPerson(
+                                                identifiedPerson.name
+                                            )]
                                         setMode("auth")
                                         addMovement(
                                             it,
@@ -236,6 +234,9 @@ class FaceDetector : Observable() {
                                     }
                                 }
                             }
+                        } else {
+                            Log.i("Recognize", "Faces size = ${faces.size}")
+                            setUnknownFaceStatus(true)
                         }
                     }
                     .addOnFailureListener { exception ->
@@ -245,13 +246,9 @@ class FaceDetector : Observable() {
             else -> {
                 mlkitFaceDetector.process(inputImage)
                     .addOnSuccessListener { faces ->
-                        if (faces.size > 0) {
+                        if (faces.size == 1) {
                             counter++
-                            Log.i("FPS", "Counter at: $counter")
                             faces.forEach {
-                                if (it.trackingId != 0) {
-                                    setUnknownFaceStatus(true)
-                                }
                                 if (facesHashMap.containsKey(it.trackingId!!) && !facesHashMap[it.trackingId!!].equals(
                                         "unknown"
                                     ) && counter != 1
@@ -264,24 +261,11 @@ class FaceDetector : Observable() {
                                         counter = 0
                                     }
                                 } else {
-                                    faceBitmap = getFaceBitmap(
-                                        getScaledBoundingBox(it, this), Bitmap.createBitmap(
-                                            BitmapUtils.getBitmap(
-                                                ByteBuffer.wrap(data),
-                                                this
-                                            )!!
-                                        )
-                                    )
-                                    identifiedPerson = faceClassifier.classify(faceBitmap)
-                                    Log.i("FaceRecognition", "HashMap: $facesHashMap")
-                                    if (identifiedPerson.name != "unknown") {
-                                        facesHashMap[it.trackingId!!] = identifiedPerson.name
-                                    } else {
-                                        setUnknownFaceStatus(true)
-                                    }
+                                    identifyFromBitmap(it, this, data, faceClassifier)
                                 }
                             }
                         } else {
+                            Log.i("Recognize", "Faces size = ${faces.size}")
                             setUnknownFaceStatus(true)
                         }
                     }
@@ -291,6 +275,51 @@ class FaceDetector : Observable() {
                     }
 
             }
+        }
+    }
+
+    private fun makePersonFromBitmap(
+        face: Face,
+        frame: Frame,
+        data: ByteArray,
+        faceClassifier: FaceClassifier,
+        name: String
+    ) {
+        faceBitmap = getFaceBitmap(
+            getScaledBoundingBox(face, frame), Bitmap.createBitmap(
+                BitmapUtils.getBitmap(
+                    ByteBuffer.wrap(data),
+                    frame
+                )!!
+            )
+        )
+        val embedding = faceClassifier.getEmbedding(faceBitmap)
+        val person = personsDB.getPerson(name)
+        person.addEmbeddings(embedding)
+        personsDB.add(person)
+    }
+
+    private fun identifyFromBitmap(
+        face: Face,
+        frame: Frame,
+        data: ByteArray,
+        faceClassifier: FaceClassifier
+    ) {
+        faceBitmap = getFaceBitmap(
+            getScaledBoundingBox(face, frame), Bitmap.createBitmap(
+                BitmapUtils.getBitmap(
+                    ByteBuffer.wrap(data),
+                    frame
+                )!!
+            )
+        )
+        identifiedPerson = faceClassifier.classify(faceBitmap)
+        Log.i("FaceRecognition", "HashMap: $facesHashMap")
+        if (identifiedPerson.name != "unknown") {
+            facesHashMap[face.trackingId!!] = identifiedPerson.name
+        } else {
+            Log.i("Recognize", "Identified person = unknown")
+            setUnknownFaceStatus(true)
         }
     }
 

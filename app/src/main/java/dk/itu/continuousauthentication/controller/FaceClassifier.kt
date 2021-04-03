@@ -70,15 +70,16 @@ class FaceClassifier private constructor(context: Context) {
 
     private fun recognize(embedding: FloatArray): Person {
         if (personsDB.isNotEmpty()) {
-            val similarities = LinkedHashMap<Float, String>()
+            val similarities = HashMap<Float, String>()
             for (person in personsDB.getPersonsDB()) {
                 for (personEmbedding in person.embeddings) {
                     similarities[cosineSimilarity(personEmbedding, embedding)] = person.name
                 }
             }
             val maxVal = Collections.max(similarities.keys)
-            Log.i("FaceRecognition", "MaxVal: $maxVal")
-            return if (maxVal > 0.8) {
+            Log.i("Recognize", "Similarities: $similarities")
+            Log.i("Recognize", "MaxVal: $maxVal Person: ${similarities[maxVal]}")
+            return if (maxVal > 0.7) {
                 similarities[maxVal]?.let { personsDB.getPerson(it) }!!
             } else Person("unknown")
         }

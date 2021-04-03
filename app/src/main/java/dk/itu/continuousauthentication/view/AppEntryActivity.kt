@@ -14,7 +14,7 @@ import dk.itu.continuousauthentication.utils.Frame
 import dk.itu.continuousauthentication.utils.LensFacing
 import java.util.*
 
-class AppEntryActivity: AppCompatActivity(), Observer {
+class AppEntryActivity : AppCompatActivity(), Observer {
     // GUI variables
     private lateinit var viewfinder: CameraView
     private lateinit var homeBtn: Button
@@ -40,12 +40,18 @@ class AppEntryActivity: AppCompatActivity(), Observer {
 
         homeBtn = findViewById(R.id.btn_home)
         homeBtn.setOnClickListener {
+            faceDetector.close()
+            viewfinder.destroy()
             val intent = Intent(this, MainActivity::class.java)
+            finish()
             startActivity(intent)
         }
         decisionBtn = findViewById(R.id.btn_decision)
         decisionBtn.setOnClickListener {
+            faceDetector.close()
+            viewfinder.destroy()
             val intent = Intent(this, AuthenticationActivity::class.java)
+            finish()
             startActivity(intent)
         }
     }
@@ -76,6 +82,7 @@ class AppEntryActivity: AppCompatActivity(), Observer {
             faceDetector.close()
             viewfinder.destroy()
             val intent = Intent(this, MainActivity::class.java)
+            finish()
             startActivity(intent)
         }
     }
@@ -90,12 +97,8 @@ class AppEntryActivity: AppCompatActivity(), Observer {
                     size = Size(it.size.width, it.size.height),
                     format = it.format,
                     lensFacing = if (viewfinder.facing == Facing.BACK) LensFacing.BACK else LensFacing.FRONT
-                ), this, "unknown")
-            if (faceDetector.getUnknownFaceStatus()) {
-                faceDetector.setUnknownFaceStatus(false)
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-            }
+                ), this, "unknown"
+            )
         }
     }
 

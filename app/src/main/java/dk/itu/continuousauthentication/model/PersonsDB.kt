@@ -6,9 +6,9 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import com.google.gson.Gson
-import dk.itu.continuousauthentication.database.PersonBaseHelper
-import dk.itu.continuousauthentication.database.PersonCursorWrapper
-import dk.itu.continuousauthentication.database.PersonsDBSchema
+import dk.itu.continuousauthentication.model.database.PersonBaseHelper
+import dk.itu.continuousauthentication.model.database.PersonCursorWrapper
+import dk.itu.continuousauthentication.model.database.PersonsDBSchema
 
 class PersonsDB private constructor(context: Context) {
 
@@ -39,10 +39,21 @@ class PersonsDB private constructor(context: Context) {
         val values = getContentValues(person)
         if (!getPersonsDB().contains(person)) {
             mDatabase.insert(PersonsDBSchema.PersonTable.NAME, null, values)
-            Log.i("PersonsDB", "Adding ${person.name} with embeddings of size ${person.embeddings.size} and the movements ${person.movements}")
+            Log.i(
+                "PersonsDB",
+                "Adding ${person.name} with embeddings of size ${person.embeddings.size} and the movements ${person.movements}"
+            )
         } else {
-            mDatabase.update(PersonsDBSchema.PersonTable.NAME, values, null, null)
-            Log.i("PersonsDB", "Updating ${person.name} with embeddings of size ${person.embeddings.size} and the movements ${person.movements}")
+            mDatabase.update(
+                PersonsDBSchema.PersonTable.NAME,
+                values,
+                PersonsDBSchema.PersonTable.Cols.NAME + "= ?",
+                arrayOf(person.name)
+            )
+            Log.i(
+                "PersonsDB",
+                "Updating ${person.name} with embeddings of size ${person.embeddings.size} and the movements ${person.movements}"
+            )
         }
     }
 

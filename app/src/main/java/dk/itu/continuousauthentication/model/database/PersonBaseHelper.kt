@@ -1,4 +1,4 @@
-package dk.itu.continuousauthentication.database
+package dk.itu.continuousauthentication.model.database
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase

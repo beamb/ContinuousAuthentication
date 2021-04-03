@@ -29,14 +29,15 @@ class MainActivity : AppCompatActivity() {
         enrollButton = findViewById(R.id.btn_enrollment)
         enrollButton.setOnClickListener {
             val intent = Intent(this, NameEnrollmentActivity::class.java)
-            startActivity(intent)}
+            startActivity(intent)
+        }
 
         authButton = findViewById(R.id.btn_authentication)
         authButton.setOnClickListener {
             val intent = Intent(this, AuthenticationActivity::class.java)
             startActivity(intent)
         }
-        if (intent.hasExtra(EXTRA_LOCK) && intent.getBooleanExtra(EXTRA_LOCK, false)){
+        if (intent.hasExtra(EXTRA_LOCK) && intent.getBooleanExtra(EXTRA_LOCK, false)) {
             enrollButton.isEnabled = false
             authButton.isEnabled = false
             Handler(Looper.getMainLooper()).postDelayed({ // This method will be executed once the timer is over

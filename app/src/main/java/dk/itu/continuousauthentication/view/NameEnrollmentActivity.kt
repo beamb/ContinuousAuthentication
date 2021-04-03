@@ -36,10 +36,12 @@ class NameEnrollmentActivity : AppCompatActivity() {
                     personsDB.add(person)
                     val intent = Intent(this, EnrollmentActivity::class.java)
                     intent.putExtra(EXTRA_NAME, name)
+                    finish()
                     startActivity(intent)
                 } else {
                     val intent = Intent(this, AuthenticationActivity::class.java)
                     intent.putExtra(EXTRA_NAME, name)
+                    finish()
                     startActivity(intent)
                 }
             } else {

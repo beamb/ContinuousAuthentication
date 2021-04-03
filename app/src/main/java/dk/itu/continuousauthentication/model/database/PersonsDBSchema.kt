@@ -1,4 +1,4 @@
-package dk.itu.continuousauthentication.database
+package dk.itu.continuousauthentication.model.database
 
 class PersonsDBSchema {
     object PersonTable {

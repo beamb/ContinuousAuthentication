@@ -1,7 +1,9 @@
 package dk.itu.continuousauthentication.controller
 
+import android.content.Context
 import android.util.Log
 import dk.itu.continuousauthentication.model.Person
+import dk.itu.continuousauthentication.model.PersonsDB
 import java.lang.StringBuilder
 
 class MovementClassifier private constructor(val person: Person) {
@@ -11,12 +13,18 @@ class MovementClassifier private constructor(val person: Person) {
     fun addInput(movement: String) {
         inputs.append(movement)
         Log.i("MovementClassifier", "Input size: ${inputs.length} and person: ${person.name}")
-        Log.i("MovementClassifier", "Input: $inputs and person movements length: ${person.movements.length}")
-        Log.i("MovementClassifier", "Input: $inputs and person movements: ${person.movements}")
+        Log.i(
+            "MovementClassifier",
+            "Input: $inputs and person movements length: ${personsDB.getPerson(person.name).movements.length}"
+        )
+        Log.i(
+            "MovementClassifier",
+            "Input: $inputs and person movements: ${personsDB.getPerson(person.name).movements}"
+        )
     }
 
     fun checkInput(): Boolean {
-        val secret = person.movements.toString()
+        val secret = personsDB.getPerson(person.name).movements.toString()
         val input = inputs.toString()
         return input == secret
     }
@@ -49,8 +57,13 @@ class MovementClassifier private constructor(val person: Person) {
 
     companion object {
         private lateinit var sMovementClassifier: MovementClassifier
-        operator fun get(person: Person): MovementClassifier {
-            if (!::sMovementClassifier.isInitialized) sMovementClassifier = MovementClassifier(person)
+        private lateinit var personsDB: PersonsDB
+
+        operator fun get(context: Context, person: Person): MovementClassifier {
+            if (!::sMovementClassifier.isInitialized || sMovementClassifier.person.name != person.name) {
+                personsDB = PersonsDB[context]
+                sMovementClassifier = MovementClassifier(person)
+            }
             return sMovementClassifier
         }
     }

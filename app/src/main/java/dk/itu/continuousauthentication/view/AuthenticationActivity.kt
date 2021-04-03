@@ -60,8 +60,11 @@ class AuthenticationActivity : AppCompatActivity(), Observer {
                 faceDetector.setIsAuthenticating(false)
                 if (::name.isInitialized) {
                     if (faceDetector.getIdentifiedPerson().name == name) {
+                        faceDetector.close()
+                        viewfinder.destroy()
                         val intent = Intent(this, EnrollmentActivity::class.java)
                         intent.putExtra(EXTRA_NAME, name)
+                        finish()
                         startActivity(intent)
                     } else {
                         val toast = Toast.makeText(
@@ -71,11 +74,19 @@ class AuthenticationActivity : AppCompatActivity(), Observer {
                         )
                         toast.setGravity(Gravity.CENTER, 0, 0)
                         toast.show()
+                        Log.i("Recognize", "Sorry, you don't seem to be $name")
+                        faceDetector.close()
+                        viewfinder.destroy()
                         val intent = Intent(this, MainActivity::class.java)
+                        finish()
                         startActivity(intent)
                     }
                 } else {
+                    Log.i("Recognize", "Gained access to the app")
+                    faceDetector.close()
+                    viewfinder.destroy()
                     val intent = Intent(this, AppEntryActivity::class.java)
+                    finish()
                     startActivity(intent)
                 }
             } else {
@@ -101,8 +112,12 @@ class AuthenticationActivity : AppCompatActivity(), Observer {
                     )
                     toast.setGravity(Gravity.CENTER, 0, 0)
                     toast.show()
+                    Log.i("Recgonize", "Too many failed attempts")
+                    faceDetector.close()
+                    viewfinder.destroy()
                     val intent = Intent(this, MainActivity::class.java)
                     intent.putExtra(EXTRA_LOCK, true)
+                    finish()
                     startActivity(intent)
                 }
             }
@@ -131,6 +146,7 @@ class AuthenticationActivity : AppCompatActivity(), Observer {
 
     override fun update(observable: Observable?, data: Any?) {
         if (faceDetector.getUnknownFaceStatus()) {
+            Log.i("Recognize", "Update was called")
             faceDetector.setIsAuthenticating(false)
             faceDetector.setStartAuthentication(false)
             faceDetector.setUnknownFaceStatus(false)
@@ -138,6 +154,7 @@ class AuthenticationActivity : AppCompatActivity(), Observer {
             viewfinder.destroy()
             val intent = Intent(this, MainActivity::class.java)
             intent.putExtra(EXTRA_LOCK, true)
+            finish()
             startActivity(intent)
         }
     }
