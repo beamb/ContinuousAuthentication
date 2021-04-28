@@ -57,69 +57,6 @@ object FaceMovement {
         val person = personsDB.getPerson(name)
 
         when {
-            smile!! > 0.9 -> {
-                if (!isSmiling) {
-                    isSmiling = true
-                    val msg = "What a great smile ${person.name}!"
-                    manageMovement(person, personsDB, classifier, msg, context, Smile)
-                    return true
-                }
-                return false
-            }
-            rightEye!! < 0.1 && leftEye!! < 0.1 -> {
-                bothEyesCounter++
-                rightEyeCounter = 0
-                leftEyeCounter = 0
-                if (bothEyesCounter == 6) {
-                    val msg = "Your eyes are closed ${person.name}!"
-                    manageMovement(
-                        person,
-                        personsDB,
-                        classifier,
-                        msg,
-                        context,
-                        Closed
-                    )
-                    return true
-                }
-                return false
-            }
-            rightEye > 0.5 && leftEye!! < 0.1 -> {
-                rightEyeCounter++
-                bothEyesCounter = 0
-                leftEyeCounter = 0
-                if (rightEyeCounter == 3) {
-                    val msg = "Right Wink ${person.name}!"
-                    manageMovement(
-                        person,
-                        personsDB,
-                        classifier,
-                        msg,
-                        context,
-                        RightWink
-                    )
-                    return true
-                }
-                return false
-            }
-            rightEye < 0.1 && leftEye!! > 0.5 -> {
-                leftEyeCounter++
-                bothEyesCounter = 0
-                rightEyeCounter = 0
-                if (leftEyeCounter == 3) {
-                    val msg = "Left Wink ${person.name}!"
-                    manageMovement(
-                        person,
-                        personsDB,
-                        classifier,
-                        msg,
-                        context,
-                        LeftWink
-                    )
-                    return true
-                }
-                return false
-            }
             rotY > 20.toFloat() -> {
                 if (!isFaceLeft) {
                     isFaceLeft = true
@@ -184,6 +121,69 @@ object FaceMovement {
                         context,
                         LeftTilt
                     )
+                    return true
+                }
+                return false
+            }
+            rightEye!! < 0.1 && leftEye!! < 0.1 -> {
+                bothEyesCounter++
+                rightEyeCounter = 0
+                leftEyeCounter = 0
+                if (bothEyesCounter == 6) {
+                    val msg = "Your eyes are closed ${person.name}!"
+                    manageMovement(
+                        person,
+                        personsDB,
+                        classifier,
+                        msg,
+                        context,
+                        Closed
+                    )
+                    return true
+                }
+                return false
+            }
+            rightEye > 0.5 && leftEye!! < 0.1 -> {
+                rightEyeCounter++
+                bothEyesCounter = 0
+                leftEyeCounter = 0
+                if (rightEyeCounter == 3) {
+                    val msg = "Right Wink ${person.name}!"
+                    manageMovement(
+                        person,
+                        personsDB,
+                        classifier,
+                        msg,
+                        context,
+                        RightWink
+                    )
+                    return true
+                }
+                return false
+            }
+            rightEye < 0.1 && leftEye!! > 0.5 -> {
+                leftEyeCounter++
+                bothEyesCounter = 0
+                rightEyeCounter = 0
+                if (leftEyeCounter == 3) {
+                    val msg = "Left Wink ${person.name}!"
+                    manageMovement(
+                        person,
+                        personsDB,
+                        classifier,
+                        msg,
+                        context,
+                        LeftWink
+                    )
+                    return true
+                }
+                return false
+            }
+            smile!! > 0.9 -> {
+                if (!isSmiling) {
+                    isSmiling = true
+                    val msg = "What a great smile ${person.name}!"
+                    manageMovement(person, personsDB, classifier, msg, context, Smile)
                     return true
                 }
                 return false
