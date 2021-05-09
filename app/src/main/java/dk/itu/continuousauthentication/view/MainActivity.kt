@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
     // GUI variables
     private lateinit var enrollButton: Button
     private lateinit var authButton: Button
+    private lateinit var appEntryButton: Button
 
     // Model: Database of persons
     private lateinit var personsDB: PersonsDB
@@ -37,7 +38,7 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, AuthenticationActivity::class.java)
             startActivity(intent)
         }
-        if (intent.hasExtra(EXTRA_LOCK) && intent.getBooleanExtra(EXTRA_LOCK, false)) {
+        /*if (intent.hasExtra(EXTRA_LOCK) && intent.getBooleanExtra(EXTRA_LOCK, false)) {
             enrollButton.isEnabled = false
             authButton.isEnabled = false
             Handler(Looper.getMainLooper()).postDelayed({ // This method will be executed once the timer is over
@@ -45,6 +46,12 @@ class MainActivity : AppCompatActivity() {
                 authButton.isEnabled = true
                 Log.d("Delay", "resend1")
             }, 60000) // set time as per your requirement
+        }*/
+
+        appEntryButton = findViewById(R.id.btn_app_entry)
+        appEntryButton.setOnClickListener {
+            val intent = Intent(this, AppEntryActivity::class.java)
+            startActivity(intent)
         }
     }
 }

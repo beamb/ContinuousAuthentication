@@ -19,4 +19,5 @@
     <string name="msg_incorrect">Incorrect! Please try again.</string>
     <string name="msg_timeout">Incorrect! Wait 1 minute before trying again.</string>
     <string name="menu_hint">Hint</string>
+    <string name="button_app_entry">Access App -- TEST</string>
 </resources>

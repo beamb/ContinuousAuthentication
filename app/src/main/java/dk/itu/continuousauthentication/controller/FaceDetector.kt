@@ -127,17 +127,19 @@ class FaceDetector : Observable() {
                         if (faces.size == 1) {
                             counter++
                             faces.forEach {
-                                if (!::classifier.isInitialized) classifier =
-                                    MovementClassifier[context, personsDB.getPerson(name)]
-                                if (personsDB.getPerson(name).movements.length <= 4) {
+                                if (!::classifier.isInitialized) {
+                                    classifier =
+                                        MovementClassifier[context, personsDB.getPerson(name)]
+                                }
+                                if (personsDB.getPerson(name).movements.length <= 5) {
                                     finishedEnrollmentStatus = false
                                     setMode("add")
-                                    if (counter == 1 || addMovement(
+                                    if (counter == 1 /*|| addMovement(
                                             it,
                                             context,
                                             name,
                                             classifier
-                                        )
+                                        )*/
                                     ) {
                                         Log.i(
                                             "Recognize",
@@ -147,18 +149,24 @@ class FaceDetector : Observable() {
                                         )
                                         makePersonFromBitmap(it, this, data, faceClassifier, name)
                                     }
+                                    addMovement(
+                                        it,
+                                        context,
+                                        name,
+                                        classifier
+                                    )
                                 } else {
-                                    setMode("more")
+                                    /*setMode("more")
                                     if (addMovement(it, context, name, classifier)) {
                                         Log.i("Recognize", "Capturing you, $name!")
                                         makePersonFromBitmap(it, this, data, faceClassifier, name)
-                                    }
+                                    }*/
                                     finishedEnrollmentStatus = true
                                     counter = 0
                                 }
                             }
                         } else {
-                            Log.i("Recognize", "Faces size = ${faces.size}")
+                            Log.i("Recognize", "Locked out because faces.size = ${faces.size}")
                             setUnknownFaceStatus(true)
                         }
                     }
@@ -180,38 +188,26 @@ class FaceDetector : Observable() {
                                     if (counter > 20) {
                                         counter = 0
                                     }
-                                    if (::classifier.isInitialized) {
-                                        if (classifier.person.name != identifiedPerson.name) classifier =
-                                            MovementClassifier[context, personsDB.getPerson(
-                                                identifiedPerson.name
-                                            )]
-                                        setMode("auth")
-                                        addMovement(
-                                            it,
-                                            context,
-                                            identifiedPerson.name,
-                                            classifier
-                                        )
-                                    } else {
-                                        classifier =
-                                            MovementClassifier[context, personsDB.getPerson(
-                                                identifiedPerson.name
-                                            )]
-                                        setMode("auth")
-                                        addMovement(
-                                            it,
-                                            context,
-                                            identifiedPerson.name,
-                                            classifier
-                                        )
-                                    }
+                                    setMode("auth")
+                                    addMovement(
+                                        it,
+                                        context,
+                                        identifiedPerson.name,
+                                        classifier
+                                    )
                                 } else {
                                     identifyFromBitmap(it, this, data, faceClassifier)
                                     if (::classifier.isInitialized) {
-                                        if (classifier.person.name != identifiedPerson.name) classifier =
-                                            MovementClassifier[context, personsDB.getPerson(
-                                                identifiedPerson.name
-                                            )]
+                                        if (classifier.person.name != identifiedPerson.name) {
+                                            Log.i(
+                                                "MovementClassifier",
+                                                "${classifier.person.name} isn't equals ${identifiedPerson.name}"
+                                            )
+                                            classifier =
+                                                MovementClassifier[context, personsDB.getPerson(
+                                                    identifiedPerson.name
+                                                )]
+                                        }
                                         setMode("auth")
                                         addMovement(
                                             it,
@@ -235,7 +231,7 @@ class FaceDetector : Observable() {
                                 }
                             }
                         } else {
-                            Log.i("Recognize", "Faces size = ${faces.size}")
+                            Log.i("Recognize", "Locked out because faces.size = ${faces.size}")
                             setUnknownFaceStatus(true)
                         }
                     }
@@ -261,11 +257,26 @@ class FaceDetector : Observable() {
                                         counter = 0
                                     }
                                 } else {
-                                    identifyFromBitmap(it, this, data, faceClassifier)
+                                    if (::identifiedPerson.isInitialized) {
+                                        val currentPersonName = identifiedPerson.name
+                                        identifyFromBitmap(it, this, data, faceClassifier)
+                                        if (currentPersonName != identifiedPerson.name) {
+                                            Log.i(
+                                                "Recognize",
+                                                "$currentPersonName is now ${identifiedPerson.name}"
+                                            )
+                                        }
+                                        /*if (identifiedPerson.name == "unknown") {
+                                            Log.i("Recognize", "Locked out because identified person = ${identifiedPerson.name}")
+                                            setUnknownFaceStatus(true)
+                                        }*/
+                                    } else {
+                                        identifyFromBitmap(it, this, data, faceClassifier)
+                                    }
                                 }
                             }
                         } else {
-                            Log.i("Recognize", "Faces size = ${faces.size}")
+                            Log.i("Recognize", "Locked out because faces.size = ${faces.size}")
                             setUnknownFaceStatus(true)
                         }
                     }
@@ -314,13 +325,14 @@ class FaceDetector : Observable() {
             )
         )
         identifiedPerson = faceClassifier.classify(faceBitmap)
+        Log.i("Recognize", "Identified: ${identifiedPerson.name}")
         Log.i("FaceRecognition", "HashMap: $facesHashMap")
         if (identifiedPerson.name != "unknown") {
             facesHashMap[face.trackingId!!] = identifiedPerson.name
-        } else {
+        } /*else {
             Log.i("Recognize", "Identified person = unknown")
             setUnknownFaceStatus(true)
-        }
+        }*/
     }
 
     fun resetMovementClassifier() {

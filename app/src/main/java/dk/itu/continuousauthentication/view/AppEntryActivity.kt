@@ -2,6 +2,7 @@ package dk.itu.continuousauthentication.view
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.util.Size
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
@@ -78,11 +79,11 @@ class AppEntryActivity : AppCompatActivity(), Observer {
 
     override fun update(observable: Observable?, data: Any?) {
         if (faceDetector.getUnknownFaceStatus()) {
-            faceDetector.setUnknownFaceStatus(false)
+            Log.i("Recognize", "Update was called")
             faceDetector.close()
             viewfinder.destroy()
-            val intent = Intent(this, MainActivity::class.java)
             finish()
+            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
     }
@@ -90,15 +91,17 @@ class AppEntryActivity : AppCompatActivity(), Observer {
     private fun setupCamera(lensFacing: Facing) {
         viewfinder.facing = lensFacing
         viewfinder.addFrameProcessor {
-            faceDetector.process(
-                Frame(
-                    data = it.data,
-                    rotation = it.rotation,
-                    size = Size(it.size.width, it.size.height),
-                    format = it.format,
-                    lensFacing = if (viewfinder.facing == Facing.BACK) LensFacing.BACK else LensFacing.FRONT
-                ), this, "unknown"
-            )
+            if (it != null) {
+                faceDetector.process(
+                    Frame(
+                        data = it.data,
+                        rotation = it.rotation,
+                        size = Size(it.size.width, it.size.height),
+                        format = it.format,
+                        lensFacing = if (viewfinder.facing == Facing.BACK) LensFacing.BACK else LensFacing.FRONT
+                    ), this, "unknown"
+                )
+            }
         }
     }
 

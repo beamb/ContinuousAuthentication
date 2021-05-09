@@ -15,17 +15,19 @@ class MovementClassifier private constructor(val person: Person) {
         Log.i("MovementClassifier", "Input size: ${inputs.length} and person: ${person.name}")
         Log.i(
             "MovementClassifier",
-            "Input: $inputs and person movements length: ${personsDB.getPerson(person.name).movements.length}"
-        )
-        Log.i(
-            "MovementClassifier",
-            "Input: $inputs and person movements: ${personsDB.getPerson(person.name).movements}"
+            "${person.name} has input: $inputs and has movements: ${personsDB.getPerson(person.name).movements}"
         )
     }
 
     fun checkInput(): Boolean {
         val secret = personsDB.getPerson(person.name).movements.toString()
         val input = inputs.toString()
+        Log.i("MovementClassifier", "Person we're matching is ${person.name}")
+        Log.i("MovementClassifier", "${person.name} has this secret: ${personsDB.getPerson(person.name).movements}")
+        Log.i("MovementClassifier", "Input we're matching is $input")
+        if (person.name == "unknown") {
+            return false
+        }
         return input == secret
     }
 

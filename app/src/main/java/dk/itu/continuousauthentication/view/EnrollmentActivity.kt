@@ -146,12 +146,10 @@ class EnrollmentActivity : AppCompatActivity(), Observer {
     override fun update(observable: Observable?, data: Any?) {
         if (faceDetector.getUnknownFaceStatus()) {
             Log.i("Recognize", "Update was called")
-            faceDetector.setIsEnrolling(false)
-            faceDetector.setUnknownFaceStatus(false)
             faceDetector.close()
             viewfinder.destroy()
-            val intent = Intent(this, MainActivity::class.java)
             finish()
+            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
     }
@@ -159,15 +157,17 @@ class EnrollmentActivity : AppCompatActivity(), Observer {
     private fun setupCamera(lensFacing: Facing) {
         viewfinder.facing = lensFacing
         viewfinder.addFrameProcessor {
-            faceDetector.process(
-                Frame(
-                    data = it.data,
-                    rotation = it.rotation,
-                    size = Size(it.size.width, it.size.height),
-                    format = it.format,
-                    lensFacing = if (viewfinder.facing == Facing.BACK) LensFacing.BACK else LensFacing.FRONT
-                ), this, name
-            )
+            if (it != null) {
+                faceDetector.process(
+                    Frame(
+                        data = it.data,
+                        rotation = it.rotation,
+                        size = Size(it.size.width, it.size.height),
+                        format = it.format,
+                        lensFacing = if (viewfinder.facing == Facing.BACK) LensFacing.BACK else LensFacing.FRONT
+                    ), this, name
+                )
+            }
         }
     }
 
