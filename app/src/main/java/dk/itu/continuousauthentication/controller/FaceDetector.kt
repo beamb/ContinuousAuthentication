@@ -129,15 +129,10 @@ class FaceDetector : Observable() {
                             faces.forEach {
                                 if (!::classifier.isInitialized) classifier =
                                     MovementClassifier[context, personsDB.getPerson(name)]
-                                if (personsDB.getPerson(name).movements.length <= 4) {
+                                if (personsDB.getPerson(name).movements.length <= 5) {
                                     finishedEnrollmentStatus = false
                                     setMode("add")
-                                    if (counter == 1 || addMovement(
-                                            it,
-                                            context,
-                                            name,
-                                            classifier
-                                        )
+                                    if (counter == 1
                                     ) {
                                         Log.i(
                                             "Recognize",
@@ -147,12 +142,13 @@ class FaceDetector : Observable() {
                                         )
                                         makePersonFromBitmap(it, this, data, faceClassifier, name)
                                     }
+                                    addMovement(
+                                        it,
+                                        context,
+                                        name,
+                                        classifier
+                                    )
                                 } else {
-                                    setMode("more")
-                                    if (addMovement(it, context, name, classifier)) {
-                                        Log.i("Recognize", "Capturing you, $name!")
-                                        makePersonFromBitmap(it, this, data, faceClassifier, name)
-                                    }
                                     finishedEnrollmentStatus = true
                                     counter = 0
                                 }
@@ -172,9 +168,7 @@ class FaceDetector : Observable() {
                         if (faces.size == 1) {
                             counter++
                             faces.forEach {
-                                if (facesHashMap.containsKey(it.trackingId!!) && !facesHashMap[it.trackingId!!].equals(
-                                        "unknown"
-                                    ) && counter != 1
+                                if (facesHashMap.containsKey(it.trackingId!!) && counter != 1
                                 ) {
                                     Log.i("FaceRecognition", "Counter: $counter")
                                     if (counter > 20) {
@@ -249,9 +243,7 @@ class FaceDetector : Observable() {
                         if (faces.size == 1) {
                             counter++
                             faces.forEach {
-                                if (facesHashMap.containsKey(it.trackingId!!) && !facesHashMap[it.trackingId!!].equals(
-                                        "unknown"
-                                    ) && counter != 1
+                                if (facesHashMap.containsKey(it.trackingId!!) && counter != 1
                                 ) {
                                     Log.i(
                                         "FaceRecognition",

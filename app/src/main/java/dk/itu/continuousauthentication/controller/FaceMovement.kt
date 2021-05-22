@@ -213,12 +213,12 @@ object FaceMovement {
         if (addMode) {
             person.addMovement(movement)
             personsDB.add(person)
-            displayToast(context, msg)
+            //displayToast(context, msg)
         } else if (authMode) {
             classifier.addInput(movement)
-            displayToast(context, msg)
+            //displayToast(context, msg)
         } else if (moreMode && person.movements.contains(movement)) {
-            displayToast(context, msg)
+            //displayToast(context, msg)
         }
         Log.i(TAG, msg)
     }

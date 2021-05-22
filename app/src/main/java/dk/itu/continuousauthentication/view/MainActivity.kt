@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
             Handler(Looper.getMainLooper()).postDelayed({ // This method will be executed once the timer is over
                 enrollButton.isEnabled = true
                 authButton.isEnabled = true
-                Log.d("Delay", "resend1")
+                Log.d("Delay", "Lockout complete")
             }, 60000) // set time as per your requirement
         }
     }
