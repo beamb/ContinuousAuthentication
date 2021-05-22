@@ -82,15 +82,30 @@ class AuthenticationActivity : AppCompatActivity(), Observer {
                         startActivity(intent)
                     }
                 } else {
-                    Log.i("Recognize", "Gained access to the app")
+                    Log.i("2FA", "Gained access to the app")
+                    faceDetector.setIsAuthenticating(true)
+                    faceDetector.setStartAuthentication(true)
                     faceDetector.close()
+                    viewfinder.destroy()
+                    val intent = Intent(this, MainActivity::class.java)
+                    finish()
+                    startActivity(intent)
+                    /*faceDetector.close()
                     viewfinder.destroy()
                     val intent = Intent(this, AppEntryActivity::class.java)
                     finish()
-                    startActivity(intent)
+                    startActivity(intent)*/
                 }
             } else {
-                counter++
+                Log.i("2FA", "Did not gain access to the app")
+                faceDetector.setIsAuthenticating(true)
+                faceDetector.setStartAuthentication(true)
+                faceDetector.close()
+                viewfinder.destroy()
+                val intent = Intent(this, MainActivity::class.java)
+                finish()
+                startActivity(intent)
+                /*counter++
                 if (counter < 3) {
                     val toast = Toast.makeText(
                         this,
@@ -119,7 +134,7 @@ class AuthenticationActivity : AppCompatActivity(), Observer {
                     intent.putExtra(EXTRA_LOCK, true)
                     finish()
                     startActivity(intent)
-                }
+                }*/
             }
         }
     }

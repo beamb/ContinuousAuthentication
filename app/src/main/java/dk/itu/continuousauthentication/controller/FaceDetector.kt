@@ -47,6 +47,7 @@ class FaceDetector : Observable() {
 
     private val facesHashMap = HashMap<Int, String>()
     private var counter = 0
+    private var frameCounter = 0
     private var startAuthentication = false
     private var unknownFaceStatus = false
     private var finishedEnrollmentStatus = false
@@ -180,10 +181,7 @@ class FaceDetector : Observable() {
                         if (faces.size == 1) {
                             counter++
                             faces.forEach {
-                                if (facesHashMap.containsKey(it.trackingId!!) && !facesHashMap[it.trackingId!!].equals(
-                                        "unknown"
-                                    ) && counter != 1
-                                ) {
+                                if (counter != 1) {
                                     Log.i("FaceRecognition", "Counter: $counter")
                                     if (counter > 20) {
                                         counter = 0
@@ -244,11 +242,9 @@ class FaceDetector : Observable() {
                     .addOnSuccessListener { faces ->
                         if (faces.size == 1) {
                             counter++
+                            frameCounter++
                             faces.forEach {
-                                if (facesHashMap.containsKey(it.trackingId!!) && !facesHashMap[it.trackingId!!].equals(
-                                        "unknown"
-                                    ) && counter != 1
-                                ) {
+                                if (counter != 1) {
                                     Log.i(
                                         "FaceRecognition",
                                         "Recognition: ${it.trackingId} --> ${facesHashMap[it.trackingId!!]}"
@@ -258,25 +254,25 @@ class FaceDetector : Observable() {
                                     }
                                 } else {
                                     if (::identifiedPerson.isInitialized) {
-                                        val currentPersonName = identifiedPerson.name
+                                        //val currentPersonName = identifiedPerson.name
                                         identifyFromBitmap(it, this, data, faceClassifier)
-                                        if (currentPersonName != identifiedPerson.name) {
+                                        /*if (currentPersonName != identifiedPerson.name) {
                                             Log.i(
                                                 "Recognize",
                                                 "$currentPersonName is now ${identifiedPerson.name}"
                                             )
-                                        }
-                                        /*if (identifiedPerson.name == "unknown") {
-                                            Log.i("Recognize", "Locked out because identified person = ${identifiedPerson.name}")
-                                            setUnknownFaceStatus(true)
                                         }*/
+                                        if (identifiedPerson.name == "unknown") {
+                                            Log.i("AverageDuration", "Locked out because identified person = ${identifiedPerson.name} at frame $frameCounter")
+                                            setUnknownFaceStatus(true)
+                                        }
                                     } else {
                                         identifyFromBitmap(it, this, data, faceClassifier)
                                     }
                                 }
                             }
                         } else {
-                            Log.i("Recognize", "Locked out because faces.size = ${faces.size}")
+                            Log.i("UnauthenticatedUsage", "Locked out because ${identifiedPerson.name} left the frame")
                             setUnknownFaceStatus(true)
                         }
                     }
@@ -325,7 +321,7 @@ class FaceDetector : Observable() {
             )
         )
         identifiedPerson = faceClassifier.classify(faceBitmap)
-        Log.i("Recognize", "Identified: ${identifiedPerson.name}")
+        Log.i("1FA", "Identified: ${identifiedPerson.name}")
         Log.i("FaceRecognition", "HashMap: $facesHashMap")
         if (identifiedPerson.name != "unknown") {
             facesHashMap[face.trackingId!!] = identifiedPerson.name

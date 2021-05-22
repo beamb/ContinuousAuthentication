@@ -79,7 +79,7 @@ class AppEntryActivity : AppCompatActivity(), Observer {
 
     override fun update(observable: Observable?, data: Any?) {
         if (faceDetector.getUnknownFaceStatus()) {
-            Log.i("Recognize", "Update was called")
+            //Log.i("Recognize", "Update was called")
             faceDetector.close()
             viewfinder.destroy()
             finish()
@@ -90,6 +90,7 @@ class AppEntryActivity : AppCompatActivity(), Observer {
 
     private fun setupCamera(lensFacing: Facing) {
         viewfinder.facing = lensFacing
+        Log.i("AverageDuration", "Starting face recognition")
         viewfinder.addFrameProcessor {
             if (it != null) {
                 faceDetector.process(

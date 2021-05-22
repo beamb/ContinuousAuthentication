@@ -78,7 +78,7 @@ class FaceClassifier private constructor(context: Context) {
             }
             val maxVal = Collections.max(similarities.keys)
             //Log.i("Recognize", "Similarities: $similarities")
-            Log.i("Recognize", "MaxVal: $maxVal")
+            Log.i("1FA", "MaxVal: $maxVal")
             return if (maxVal > 0.8) {
                 similarities[maxVal]?.let { personsDB.getPerson(it) }!!
             } else Person("unknown")

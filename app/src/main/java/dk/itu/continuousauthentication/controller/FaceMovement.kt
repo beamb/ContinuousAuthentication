@@ -60,7 +60,7 @@ object FaceMovement {
             rotY > 20.toFloat() -> {
                 if (!isFaceLeft) {
                     isFaceLeft = true
-                    val msg = "Facing Left ${person.name}!"
+                    val msg = "Facing Left"
                     manageMovement(person, personsDB, classifier, msg, context, Left)
                     return true
                 }
@@ -69,7 +69,7 @@ object FaceMovement {
             rotY < (-20).toFloat() -> {
                 if (!isFaceRight) {
                     isFaceRight = true
-                    val msg = "Facing Right ${person.name}!"
+                    val msg = "Facing Right"
                     manageMovement(person, personsDB, classifier, msg, context, Right)
                     return true
                 }
@@ -78,7 +78,7 @@ object FaceMovement {
             rotX > 20.toFloat() -> {
                 if (!isFaceUp) {
                     isFaceUp = true
-                    val msg = "Facing Up ${person.name}!"
+                    val msg = "Facing Up"
                     manageMovement(person, personsDB, classifier, msg, context, Up)
                     return true
                 }
@@ -87,7 +87,7 @@ object FaceMovement {
             rotX < (-5).toFloat() -> {
                 if (!isFaceDown) {
                     isFaceDown = true
-                    val msg = "Facing Down ${person.name}!"
+                    val msg = "Facing Down"
                     manageMovement(person, personsDB, classifier, msg, context, Down)
                     return true
                 }
@@ -96,7 +96,7 @@ object FaceMovement {
             rotZ > 15.toFloat() -> {
                 if (!isTiltRight) {
                     isTiltRight = true
-                    val msg = "Right Tilt ${person.name}!"
+                    val msg = "Right Tilt"
                     manageMovement(
                         person,
                         personsDB,
@@ -112,7 +112,7 @@ object FaceMovement {
             rotZ < (-15).toFloat() -> {
                 if (!isTiltLeft) {
                     isTiltLeft = true
-                    val msg = "Left Tilt ${person.name}!"
+                    val msg = "Left Tilt"
                     manageMovement(
                         person,
                         personsDB,
@@ -130,7 +130,7 @@ object FaceMovement {
                 rightEyeCounter = 0
                 leftEyeCounter = 0
                 if (bothEyesCounter == 6) {
-                    val msg = "Your eyes are closed ${person.name}!"
+                    val msg = "Both Eyes Closed"
                     manageMovement(
                         person,
                         personsDB,
@@ -148,7 +148,7 @@ object FaceMovement {
                 bothEyesCounter = 0
                 leftEyeCounter = 0
                 if (rightEyeCounter == 3) {
-                    val msg = "Right Wink ${person.name}!"
+                    val msg = "Right Eye Closed"
                     manageMovement(
                         person,
                         personsDB,
@@ -166,7 +166,7 @@ object FaceMovement {
                 bothEyesCounter = 0
                 rightEyeCounter = 0
                 if (leftEyeCounter == 3) {
-                    val msg = "Left Wink ${person.name}!"
+                    val msg = "Left Eye Closed"
                     manageMovement(
                         person,
                         personsDB,
@@ -182,7 +182,7 @@ object FaceMovement {
             smile!! > 0.9 -> {
                 if (!isSmiling) {
                     isSmiling = true
-                    val msg = "What a great smile ${person.name}!"
+                    val msg = "Smile"
                     manageMovement(person, personsDB, classifier, msg, context, Smile)
                     return true
                 }
@@ -216,6 +216,8 @@ object FaceMovement {
             //displayToast(context, msg)
         } else if (authMode) {
             classifier.addInput(movement)
+            Log.i("2FA", msg)
+            //Log.i("MovementRecognition", "$classifier + ${classifier.hashCode()}")
             //displayToast(context, msg)
         } else if (moreMode && person.movements.contains(movement)) {
             //displayToast(context, msg)
