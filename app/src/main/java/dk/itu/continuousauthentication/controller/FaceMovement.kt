@@ -36,7 +36,7 @@ object FaceMovement {
 
     private var addMode: Boolean = true
     private var authMode: Boolean = false
-    private var moreMode: Boolean = false
+    //private var moreMode: Boolean = false
 
     fun addMovement(
         face: Face,
@@ -214,12 +214,12 @@ object FaceMovement {
             person.addMovement(movement)
             personsDB.add(person)
             //displayToast(context, msg)
-        } else if (authMode) {
+        } else /*if (authMode)*/ {
             classifier.addInput(movement)
             //displayToast(context, msg)
-        } else if (moreMode && person.movements.contains(movement)) {
+        } /*else if (moreMode && person.movements.contains(movement)) {
             //displayToast(context, msg)
-        }
+        }*/
         Log.i(TAG, msg)
     }
 
@@ -238,22 +238,22 @@ object FaceMovement {
             "add" -> {
                 addMode = true
                 authMode = false
-                moreMode = false
+                //moreMode = false
             }
             "auth" -> {
                 addMode = false
                 authMode = true
-                moreMode = false
+                //moreMode = false
             }
-            "more" -> {
+            /*"more" -> {
                 addMode = false
                 authMode = false
                 moreMode = true
-            }
+            }*/
             else -> {
                 addMode = false
                 authMode = false
-                moreMode = false
+                //moreMode = false
             }
         }
     }
