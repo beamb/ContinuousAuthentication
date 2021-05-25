@@ -1,7 +1,8 @@
-package dk.itu.continuousauthentication.utils
+package dk.itu.continuousauthentication.controller
 
 import android.graphics.*
 import android.util.Log
+import dk.itu.continuousauthentication.model.Frame
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 

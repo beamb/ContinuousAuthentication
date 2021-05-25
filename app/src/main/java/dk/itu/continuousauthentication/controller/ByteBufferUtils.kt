@@ -1,4 +1,4 @@
-package dk.itu.continuousauthentication.utils
+package dk.itu.continuousauthentication.controller
 
 import android.graphics.Bitmap
 import android.graphics.Color

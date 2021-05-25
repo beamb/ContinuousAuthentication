@@ -12,8 +12,7 @@ import dk.itu.continuousauthentication.controller.FaceMovement.addMovement
 import dk.itu.continuousauthentication.controller.FaceMovement.setMode
 import dk.itu.continuousauthentication.model.Person
 import dk.itu.continuousauthentication.model.PersonsDB
-import dk.itu.continuousauthentication.utils.BitmapUtils
-import dk.itu.continuousauthentication.utils.Frame
+import dk.itu.continuousauthentication.model.Frame
 import java.nio.ByteBuffer
 import java.util.*
 import java.util.concurrent.Executor
@@ -55,7 +54,7 @@ class FaceDetector : Observable() {
     private var isAuthenticating = false
 
     private lateinit var identifiedPerson: Person
-    private lateinit var classifier: MovementClassifier
+    private lateinit var movementClassifier: MovementClassifier
 
     // Model: Database of persons
     private lateinit var personsDB: PersonsDB
@@ -127,7 +126,7 @@ class FaceDetector : Observable() {
                         if (faces.size == 1) {
                             counter++
                             faces.forEach {
-                                if (!::classifier.isInitialized) classifier =
+                                if (!::movementClassifier.isInitialized) movementClassifier =
                                     MovementClassifier[context, personsDB.getPerson(name)]
                                 if (personsDB.getPerson(name).movements.length <= 5) {
                                     finishedEnrollmentStatus = false
@@ -146,7 +145,7 @@ class FaceDetector : Observable() {
                                         it,
                                         context,
                                         name,
-                                        classifier
+                                        movementClassifier
                                     )
                                 } else {
                                     finishedEnrollmentStatus = true
@@ -174,8 +173,8 @@ class FaceDetector : Observable() {
                                     if (counter > 20) {
                                         counter = 0
                                     }
-                                    if (::classifier.isInitialized) {
-                                        if (classifier.person.name != identifiedPerson.name) classifier =
+                                    if (::movementClassifier.isInitialized) {
+                                        if (movementClassifier.person.name != identifiedPerson.name) movementClassifier =
                                             MovementClassifier[context, personsDB.getPerson(
                                                 identifiedPerson.name
                                             )]
@@ -184,10 +183,10 @@ class FaceDetector : Observable() {
                                             it,
                                             context,
                                             identifiedPerson.name,
-                                            classifier
+                                            movementClassifier
                                         )
                                     } else {
-                                        classifier =
+                                        movementClassifier =
                                             MovementClassifier[context, personsDB.getPerson(
                                                 identifiedPerson.name
                                             )]
@@ -196,13 +195,13 @@ class FaceDetector : Observable() {
                                             it,
                                             context,
                                             identifiedPerson.name,
-                                            classifier
+                                            movementClassifier
                                         )
                                     }
                                 } else {
                                     identifyFromBitmap(it, this, data, faceClassifier)
-                                    if (::classifier.isInitialized) {
-                                        if (classifier.person.name != identifiedPerson.name) classifier =
+                                    if (::movementClassifier.isInitialized) {
+                                        if (movementClassifier.person.name != identifiedPerson.name) movementClassifier =
                                             MovementClassifier[context, personsDB.getPerson(
                                                 identifiedPerson.name
                                             )]
@@ -211,10 +210,10 @@ class FaceDetector : Observable() {
                                             it,
                                             context,
                                             identifiedPerson.name,
-                                            classifier
+                                            movementClassifier
                                         )
                                     } else {
-                                        classifier =
+                                        movementClassifier =
                                             MovementClassifier[context, personsDB.getPerson(
                                                 identifiedPerson.name
                                             )]
@@ -223,7 +222,7 @@ class FaceDetector : Observable() {
                                             it,
                                             context,
                                             identifiedPerson.name,
-                                            classifier
+                                            movementClassifier
                                         )
                                     }
                                 }
@@ -316,15 +315,15 @@ class FaceDetector : Observable() {
     }
 
     fun resetMovementClassifier() {
-        classifier.resetInput()
+        movementClassifier.resetInput()
     }
 
     fun checkInput(): Boolean {
-        return classifier.checkInput()
+        return movementClassifier.checkInput()
     }
 
     fun displayInput(): String {
-        return classifier.getInput()
+        return movementClassifier.getInput()
     }
 
     private fun getFaceBitmap(boundingBox: RectF, frame: Bitmap): Bitmap {

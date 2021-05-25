@@ -16,8 +16,8 @@ import com.otaliastudios.cameraview.Facing
 import dk.itu.continuousauthentication.R
 import dk.itu.continuousauthentication.controller.FaceDetector
 import dk.itu.continuousauthentication.model.PersonsDB
-import dk.itu.continuousauthentication.utils.Frame
-import dk.itu.continuousauthentication.utils.LensFacing
+import dk.itu.continuousauthentication.model.Frame
+import dk.itu.continuousauthentication.model.LensFacing
 import java.util.*
 
 

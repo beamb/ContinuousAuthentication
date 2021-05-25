@@ -3,7 +3,6 @@ package dk.itu.continuousauthentication.controller
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import dk.itu.continuousauthentication.utils.ByteBufferUtils
 import dk.itu.continuousauthentication.model.Person
 import dk.itu.continuousauthentication.model.PersonsDB
 import java.io.IOException
@@ -11,7 +10,6 @@ import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
-import kotlin.collections.LinkedHashMap
 import kotlin.math.sqrt
 
 import org.tensorflow.lite.Interpreter
@@ -111,6 +109,4 @@ class FaceClassifier private constructor(context: Context) {
             return sFaceClassifier
         }
     }
-
-    // TODO: Figure out best cut-off point for maxVal authentication
 }
