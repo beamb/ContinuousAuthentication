@@ -125,32 +125,37 @@ class FaceDetector : Observable() {
                     .addOnSuccessListener { faces ->
                         if (faces.size == 1) {
                             counter++
-                            faces.forEach {
-                                if (!::movementClassifier.isInitialized) movementClassifier =
-                                    MovementClassifier[context, personsDB.getPerson(name)]
-                                if (personsDB.getPerson(name).movements.length <= 5) {
-                                    finishedEnrollmentStatus = false
-                                    setMode("add")
-                                    if (counter == 1
-                                    ) {
-                                        Log.i(
-                                            "Recognize",
-                                            "Capturing you, $name when counter is at $counter and you have ${personsDB.getPerson(
-                                                name
-                                            ).movements.length} movements!"
-                                        )
-                                        makePersonFromBitmap(it, this, data, faceClassifier, name)
-                                    }
-                                    addMovement(
-                                        it,
-                                        context,
-                                        name,
-                                        movementClassifier
+                            val detectedFace = faces[0]
+                            if (!::movementClassifier.isInitialized) movementClassifier =
+                                MovementClassifier[context, personsDB.getPerson(name)]
+                            if (personsDB.getPerson(name).movements.length <= 5) {
+                                finishedEnrollmentStatus = false
+                                setMode("add")
+                                if (counter == 1
+                                ) {
+                                    Log.i(
+                                        "Recognize",
+                                        "Capturing you, $name when counter is at $counter and you have ${personsDB.getPerson(
+                                            name
+                                        ).movements.length} movements!"
                                     )
-                                } else {
-                                    finishedEnrollmentStatus = true
-                                    counter = 0
+                                    makePersonFromBitmap(
+                                        detectedFace,
+                                        this,
+                                        data,
+                                        faceClassifier,
+                                        name
+                                    )
                                 }
+                                addMovement(
+                                    detectedFace,
+                                    context,
+                                    name,
+                                    movementClassifier
+                                )
+                            } else {
+                                finishedEnrollmentStatus = true
+                                counter = 0
                             }
                         } else {
                             Log.i("Recognize", "Faces size = ${faces.size}")
@@ -166,18 +171,15 @@ class FaceDetector : Observable() {
                     .addOnSuccessListener { faces ->
                         if (faces.size == 1) {
                             counter++
-                            faces.forEach {
-                                if (facesHashMap.containsKey(it.trackingId!!) && counter != 1
-                                ) {
-                                    Log.i("FaceRecognition", "Counter: $counter")
-                                    if (counter > 20) {
-                                        counter = 0
-                                    }
-                                    recognizeMovements(context, it)
-                                } else {
-                                    identifyFromBitmap(it, this, data, faceClassifier)
-                                    recognizeMovements(context, it)
-                                }
+                            val detectedFace = faces[0]
+                            if (facesHashMap.containsKey(detectedFace.trackingId!!) && counter != 1
+                            ) {
+                                Log.i("FaceRecognition", "Counter: $counter")
+                                if (counter > 20) counter = 0
+                                recognizeMovements(context, detectedFace)
+                            } else {
+                                identifyFromBitmap(detectedFace, this, data, faceClassifier)
+                                recognizeMovements(context, detectedFace)
                             }
                         } else {
                             Log.i("Recognize", "Faces size = ${faces.size}")
@@ -193,19 +195,16 @@ class FaceDetector : Observable() {
                     .addOnSuccessListener { faces ->
                         if (faces.size == 1) {
                             counter++
-                            faces.forEach {
-                                if (facesHashMap.containsKey(it.trackingId!!) && counter != 1
-                                ) {
-                                    Log.i(
-                                        "FaceRecognition",
-                                        "Recognition: ${it.trackingId} --> ${facesHashMap[it.trackingId!!]}"
-                                    )
-                                    if (counter > 10) {
-                                        counter = 0
-                                    }
-                                } else {
-                                    identifyFromBitmap(it, this, data, faceClassifier)
-                                }
+                            val detectedFace = faces[0]
+                            if (facesHashMap.containsKey(detectedFace.trackingId!!) && counter != 1
+                            ) {
+                                Log.i(
+                                    "FaceRecognition",
+                                    "Recognition: ${detectedFace.trackingId} --> ${facesHashMap[detectedFace.trackingId!!]}"
+                                )
+                                if (counter > 10) counter = 0
+                            } else {
+                                identifyFromBitmap(detectedFace, this, data, faceClassifier)
                             }
                         } else {
                             Log.i("Recognize", "Faces size = ${faces.size}")
