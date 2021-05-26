@@ -173,58 +173,10 @@ class FaceDetector : Observable() {
                                     if (counter > 20) {
                                         counter = 0
                                     }
-                                    if (::movementClassifier.isInitialized) {
-                                        if (movementClassifier.person.name != identifiedPerson.name) movementClassifier =
-                                            MovementClassifier[context, personsDB.getPerson(
-                                                identifiedPerson.name
-                                            )]
-                                        setMode("auth")
-                                        addMovement(
-                                            it,
-                                            context,
-                                            identifiedPerson.name,
-                                            movementClassifier
-                                        )
-                                    } else {
-                                        movementClassifier =
-                                            MovementClassifier[context, personsDB.getPerson(
-                                                identifiedPerson.name
-                                            )]
-                                        setMode("auth")
-                                        addMovement(
-                                            it,
-                                            context,
-                                            identifiedPerson.name,
-                                            movementClassifier
-                                        )
-                                    }
+                                    recognizeMovements(context, it)
                                 } else {
                                     identifyFromBitmap(it, this, data, faceClassifier)
-                                    if (::movementClassifier.isInitialized) {
-                                        if (movementClassifier.person.name != identifiedPerson.name) movementClassifier =
-                                            MovementClassifier[context, personsDB.getPerson(
-                                                identifiedPerson.name
-                                            )]
-                                        setMode("auth")
-                                        addMovement(
-                                            it,
-                                            context,
-                                            identifiedPerson.name,
-                                            movementClassifier
-                                        )
-                                    } else {
-                                        movementClassifier =
-                                            MovementClassifier[context, personsDB.getPerson(
-                                                identifiedPerson.name
-                                            )]
-                                        setMode("auth")
-                                        addMovement(
-                                            it,
-                                            context,
-                                            identifiedPerson.name,
-                                            movementClassifier
-                                        )
-                                    }
+                                    recognizeMovements(context, it)
                                 }
                             }
                         } else {
@@ -266,6 +218,34 @@ class FaceDetector : Observable() {
                     }
 
             }
+        }
+    }
+
+    private fun recognizeMovements(context: Context, it: Face) {
+        if (::movementClassifier.isInitialized) {
+            if (movementClassifier.person.name != identifiedPerson.name) movementClassifier =
+                MovementClassifier[context, personsDB.getPerson(
+                    identifiedPerson.name
+                )]
+            setMode("auth")
+            addMovement(
+                it,
+                context,
+                identifiedPerson.name,
+                movementClassifier
+            )
+        } else {
+            movementClassifier =
+                MovementClassifier[context, personsDB.getPerson(
+                    identifiedPerson.name
+                )]
+            setMode("auth")
+            addMovement(
+                it,
+                context,
+                identifiedPerson.name,
+                movementClassifier
+            )
         }
     }
 
