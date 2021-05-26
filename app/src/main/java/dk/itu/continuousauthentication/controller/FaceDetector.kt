@@ -44,7 +44,6 @@ class FaceDetector : Observable() {
     private var screenHeight: Int = 0
     private var screenWidth: Int = 0
 
-    private val facesHashMap = HashMap<Int, String>()
     private var counter = 0
     private var startAuthentication = false
     private var unknownFaceStatus = false
@@ -172,8 +171,7 @@ class FaceDetector : Observable() {
                         if (faces.size == 1) {
                             counter++
                             val detectedFace = faces[0]
-                            if (facesHashMap.containsKey(detectedFace.trackingId!!) && counter != 1
-                            ) {
+                            if (counter != 1) {
                                 Log.i("FaceRecognition", "Counter: $counter")
                                 if (counter > 20) counter = 0
                                 recognizeMovements(context, detectedFace)
@@ -196,12 +194,7 @@ class FaceDetector : Observable() {
                         if (faces.size == 1) {
                             counter++
                             val detectedFace = faces[0]
-                            if (facesHashMap.containsKey(detectedFace.trackingId!!) && counter != 1
-                            ) {
-                                Log.i(
-                                    "FaceRecognition",
-                                    "Recognition: ${detectedFace.trackingId} --> ${facesHashMap[detectedFace.trackingId!!]}"
-                                )
+                            if (counter != 1) {
                                 if (counter > 10) counter = 0
                             } else {
                                 identifyFromBitmap(detectedFace, this, data, faceClassifier)
@@ -284,10 +277,7 @@ class FaceDetector : Observable() {
             )
         )
         identifiedPerson = faceClassifier.classify(faceBitmap)
-        Log.i("FaceRecognition", "HashMap: $facesHashMap")
-        if (identifiedPerson.name != "unknown") {
-            facesHashMap[face.trackingId!!] = identifiedPerson.name
-        } else {
+        if (identifiedPerson.name == "unknown") {
             Log.i("Recognize", "Identified person = unknown")
             setUnknownFaceStatus(true)
         }
