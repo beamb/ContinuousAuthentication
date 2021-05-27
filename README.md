@@ -1,5 +1,5 @@
 # Continuous authentication using "something only you can do"
-This repository contains the full code-base – including a recorded demonstration of the application – of a simple prototype implemented as a proof of concept for the thesis submitted in fulfillment of the requirements for the degree of Master of Science in Software Design at the IT University of Copenhagen.
+This repository contains the full code-base – including a recorded demonstration of the application – of a simple prototype implemented as a proof of concept for the homonymous thesis submitted in fulfillment of the requirements for the degree of Master of Science in Software Design at the IT University of Copenhagen.
 
 ## Authors
 - [**Astrid Fischer Nielsen**](https://github.com/astridfischer)
